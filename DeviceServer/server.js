@@ -1,2 +1,2 @@
-const socket = require('./utilities/socket')
+const socket = require('./socket/socket')
 socket()

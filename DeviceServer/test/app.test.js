@@ -6,11 +6,13 @@ describe('loading express',  () => {
   it('should respond correctly root path', (done) =>  {
   request(server)
     .get('/')
-    .expect(200, done);
+    .expect(200);
+    done()
   });
   it('should return 404 for everything else', (done) => {
     request(server)
       .get('/foo/bar')
-      .expect(404, done);
+      .expect(404);
+      done()
   });
 })

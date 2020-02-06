@@ -9,23 +9,18 @@ const verify = require("../utilities/VerifyToken")
 
 // Sign Up for an account
 router.post("/signUp", async (req , res ) => {
+    console.log(req.body)
     email = req.body.email.toLowerCase()
     name = req.body.name
     password = req.body.pwd
     role = ""
-
     let reg = /[a-z,.]{4,}\d{2,}@kit.edu.kh/ig
-    if ( reg.test(email) ){
-        role = "Student"
-    }else{
-        let newReg = /[a-z,.]{4,}@kit.edu.kh/ig
-        if ( newReg.test(email) ){
-            role = "Lecturer"
-        }else{
-            return res.json({"message" : "Only KIT email is allowed","errCode" : "SU-001"})
-        }
-    }
-        
+    let lectReg = /[a-z,.]{4,}@kit.edu.kh/ig
+    let devReg = /device-[A-Z,a-z,0,9]{4}@device.com/ig
+    if ( reg.test(email) ) role = "Student"
+    else if(lectReg.test(email)) role = "Lecturer" 
+    else if(devReg.test(email)) role = "Device"
+    else return res.json({"message" : "Only KIT email is allowed","errCode" : "SU-001"})
     await bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(password, salt, async (err, hash) => {
             if (err) return res.json({err})
@@ -42,8 +37,10 @@ router.post("/signUp", async (req , res ) => {
 
                 await user.save();
                 const savedCredential = await credential.save();
+                console.log("done")
                 return res.json(savedCredential);
             }catch(err){
+                console.log(err)
                 if (err.code == 11000){
                     return res.json({"message" : "Email is already registered!","errCode" : "SU-002"})
                 }
@@ -53,21 +50,6 @@ router.post("/signUp", async (req , res ) => {
     })
 
 
-})
-
-// Sign Up for an account for a device
-router.post("/deviceSignUp", async (req , res ) => {
-    const {email,name} = req.body
-    await bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(req.body.pwd, salt, async (err, hash) => {
-            if (err) return res.json({err})
-            const user =  new User({email,name})
-            const credential = new  Credential({email,pwd:hash,role:"device"})
-            const savedUser = await user.save()
-            const savedCredential = await credential.save()
-            res.json(savedCredential)
-        })
-    })
 })
 
 //Login

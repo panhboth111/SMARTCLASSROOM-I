@@ -1,12 +1,29 @@
 const mongoose = require('mongoose')
 
 const schema = mongoose.Schema({
-    deviceName:String,
-    deviceId:String,
-    socketId:String,
-    streaming:String,
-    cameraPlugged:Boolean,
-    online:Boolean
+    deviceName:{
+        type:String,
+        required:true
+    },
+    deviceId:{
+        type:String,
+        required:true
+    },
+    socketId:{
+        type:String,
+        required:true
+    },
+    streaming:{
+        type:String,
+    },
+    cameraPlugged:{
+        type:Boolean,
+        required:true
+    },
+    online:{
+        type:Boolean,
+        required:true
+    },
 })
 
 module.exports = mongoose.model('Device',schema)
