@@ -7,7 +7,7 @@ require('dotenv').config()
 const userRoute = require("../routes/users")
 const authRoute = require("../routes/auth")
 
-//MiddleWare
+//MiddleWares
 app.use(bodyParser.json())
 app.use(cors())
 app.use("/users",userRoute)

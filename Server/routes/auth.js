@@ -8,11 +8,13 @@ const validate = require("validate.js")
 const verify = require("../utilities/VerifyToken")
 
 // Sign Up for an account
-router.post("/signUp", async (req , res ) => {
+router.post("/signUp", async (req , res) => {
+    console.log(req.body)
     email = req.body.email.toLowerCase()
     name = req.body.name
     password = req.body.pwd
     role = ""
+
 
     let reg = /[a-z,.]{4,}\d{0,4}@kit.edu.kh/ig
     if ( reg.test(email) ){
@@ -20,11 +22,15 @@ router.post("/signUp", async (req , res ) => {
     }else{
         return res.json({"message" : "Only KIT email is allowed","errCode" : "SU-001"})
     }
-        
+
     await bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(password, salt, async (err, hash) => {
-            if (err) return res.json({err})
+            if (err) {
+                console.log(err)
+                return res.json({err})
+            }
             try{
+                console.log("trying...")
                 const user = new User({
                     email : email,
                     name : name
@@ -39,6 +45,7 @@ router.post("/signUp", async (req , res ) => {
                 const savedCredential = await credential.save();
                 return res.json();
             }catch(err){
+                console.log(err)
                 if (err.code == 11000){
                     return res.json({"message" : "Email is already registered!","errCode" : "SU-002"})
                 }
@@ -48,21 +55,6 @@ router.post("/signUp", async (req , res ) => {
     })
 
 
-})
-
-// Sign Up for an account for a device
-router.post("/deviceSignUp", async (req , res ) => {
-    const {email,name} = req.body
-    await bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(req.body.pwd, salt, async (err, hash) => {
-            if (err) return res.json({err})
-            const user =  new User({email,name})
-            const credential = new  Credential({email,pwd:hash,role:"device"})
-            const savedUser = await user.save()
-            const savedCredential = await credential.save()
-            res.json(savedCredential)
-        })
-    })
 })
 
 //Login
