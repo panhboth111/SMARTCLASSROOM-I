@@ -14,16 +14,11 @@ router.post("/signUp", async (req , res ) => {
     password = req.body.pwd
     role = ""
 
-    let reg = /[a-z,.]{4,}\d{2,}@kit.edu.kh/ig
+    let reg = /[a-z,.]{4,}\d{0,4}@kit.edu.kh/ig
     if ( reg.test(email) ){
         role = "Student"
     }else{
-        let newReg = /[a-z,.]{4,}@kit.edu.kh/ig
-        if ( newReg.test(email) ){
-            role = "Lecturer"
-        }else{
-            return res.json({"message" : "Only KIT email is allowed","errCode" : "SU-001"})
-        }
+        return res.json({"message" : "Only KIT email is allowed","errCode" : "SU-001"})
     }
         
     await bcrypt.genSalt(10, (err, salt) => {
@@ -42,7 +37,7 @@ router.post("/signUp", async (req , res ) => {
 
                 await user.save();
                 const savedCredential = await credential.save();
-                return res.json(savedCredential);
+                return res.json();
             }catch(err){
                 if (err.code == 11000){
                     return res.json({"message" : "Email is already registered!","errCode" : "SU-002"})
