@@ -193,6 +193,7 @@ export default {
   },
   methods: {
     async startStream() {
+      console.log("startstream")
       const stream = await backend.startStream(
         this.streamTitle,
         this.description,
@@ -202,6 +203,7 @@ export default {
         this.user.role,
         true
       );
+      console.log("backk")
       this.user.isStreaming = stream.data.isStreaming;
       // axios.post("http://10.10.15.11:5000/devices/startStreaming", {
       //   streamTitle: this.streamTitle,S
@@ -215,6 +217,7 @@ export default {
       // });
       this.start_stream = false;
       this.userCurrentStream = stream.data.streamCode;
+      location.reload()
       window.location.replace(`/stream/${this.userCurrentStream}`);
     },
     getAvailableDevices() {
@@ -224,6 +227,7 @@ export default {
       });
     },
     async deviceStartStream() {
+      console.log("device start")
       this.loading = true;
       const deviceIds = [];
       const selectedClasses = this.devices.filter(x => x["value"] == true);

@@ -27,6 +27,7 @@ router.post("/startStream", verify, async (req, res) => {
     const ownerName = req.user.name
     const {streamTitle,description,isPrivate,password} = req.body
     try{
+        console.log("tryingggg")
         var streamCode = null
         var isNotUnique = null
 
@@ -46,7 +47,8 @@ router.post("/startStream", verify, async (req, res) => {
         })
         const savedStream = await newStream.save()
         await User.updateOne({email:owner},{isStreaming : true})
-        // await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
+        await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomOwner:owner,roomId:streamCode}).catch(er => console.log(er))
+        console.log("done")
         return res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
     }catch (err){
         console.log(err)
@@ -217,7 +219,6 @@ router.post("/getCurrentlyStream", verify , async (req, res) => {
     }
 
 })
-
 // Get Stream Detials
 router.post("/getStreamDetail", verify , async (req, res) => {
     const streamCode = req.body.streamCode

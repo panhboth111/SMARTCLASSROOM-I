@@ -146,6 +146,7 @@ export default {
       const roomId = window.location.href.split("stream/");
       this.socket.emit("input", {
         username: this.user.name,
+        email:this.user.email,
         message: this.msg,
         roomId
       });

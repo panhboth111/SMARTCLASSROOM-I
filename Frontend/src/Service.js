@@ -27,6 +27,7 @@ class Service {
 
   // Start Stream
   static startStream(streamTitle, description, isPrivate, password,streamBy,role) {
+    console.log("Start")
     const token = cookie.getCookie("auth-token");
     const route = (role==='Device')?'deviceStartStream':'startStream'
     console.log(streamTitle + description + isPrivate + password);
