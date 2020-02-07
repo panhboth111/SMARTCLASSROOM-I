@@ -6,7 +6,21 @@ const uID = require("../utilities/UniqueCode")
 const verify = require("../utilities/VerifyToken")
 const Streaming = require('../models/streaming')
 
-//Get user Info
+
+// Get all user info
+router.get("/allUser", verify , async (req, res) => {
+    const role = req.user.role
+    const email = req.user.email
+    adminReg = /admin/i
+    if (adminReg.test(role)){
+        users = await User.find({email : {$ne : email} })
+        return res.json(users);
+    }else{
+        return res.json({message : "You are not authorized!", errCode : "AU-001"})
+    }
+})
+
+// Get user Info
 router.get("/user", verify , async (req, res) => {
     const email = req.user.email
     const user = await User.findOne({email})
@@ -18,6 +32,27 @@ router.get("/user", verify , async (req, res) => {
         role:req.user.role
     }
     return res.json(_user)
+})
+
+// Changer user role
+router.get("/changeRole", verify, async(req, res) => {
+    email = req.user.email
+    role = req.user.role
+    targetUser = req.body.email
+    targetRole = req.body.role
+
+    roleReg = /admin/i
+
+    if (roleReg.test(role)){
+        update = await Credential.updateOne({role : targetRole},{email : targetUser})
+        if (update.n > 0){
+            return res.json({"message" : "Success fully update user '" + targetUser + "' to '"+ targetRole +"'" })
+        }else{
+            return res.json({"messgage" : "An error occurred during role changing process"})
+        }
+    }else{
+        return res.json({"message" : "You are not authorized to performed the following task", "errCode":"CR-001"})
+    }
 })
 
 // Start stream
