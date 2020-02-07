@@ -14,5 +14,14 @@ module.exports = async app => {
             console.log(err)
         }
     })
+    app.post('/getChat',async (req,res)=> {
+        try {
+            let roomId = req.body.roomId
+            const Room_ = await Room.findOne({roomId})
+            res.json({chats:Room_.chats,questions:Room_.questions,announcement:Room_.announcement})
+        } catch (error) {
+            console.log(err)
+        }
+    })
     return app
 }

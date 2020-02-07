@@ -82,7 +82,7 @@ router.post("/startStream", verify, async (req, res) => {
         })
         const savedStream = await newStream.save()
         await User.updateOne({email:owner},{isStreaming : true})
-        await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomOwner:owner,roomId:streamCode}).catch(er => console.log(er))
+        await axios.post('http://localhost:4000/createRoom',{roomName:streamTitle,roomOwner:owner,roomId:streamCode}).catch(er => console.log(er))
         console.log("done")
         return res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
     }catch (err){

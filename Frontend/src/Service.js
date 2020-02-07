@@ -1,6 +1,6 @@
 import axios from "axios";
 import cookie from "./cookie";
-const url = "http://10.10.15.11:3000/";
+const url = "http://localhost:3000/";
 
 class Service {
   // Get UserInfo
@@ -132,6 +132,18 @@ class Service {
   static async logout() {
     cookie.setCookie("auth-token", "", 30);
     localStorage.setItem("LastLogged", Date.now());
+  }
+
+  static async getAllChat(roomId){
+    const chat = await axios.post(`http://localhost:4000/getChat`, {
+      roomId
+    });
+    if (chat.data != undefined){
+      console.log(chat)
+      return {chats : chat.data.chats, questions : chat.data.questions, announcement : chat.data.announcement}
+    }else{
+      return null
+    }
   }
 }
 
