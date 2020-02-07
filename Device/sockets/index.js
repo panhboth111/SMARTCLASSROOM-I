@@ -6,6 +6,7 @@ const handleInit = require('./handleInit')
 const handleUpdateInfo = require('./handleUpdateInfo')
 const handleStartStream = require('./handleStartStream')
 const handleStartCast = require('./handleStartCast')
+const handleChangeName = require('./handleChangeName')
 const handleStop = require('./handleStop')
 module.exports = async () => {
     usb('add')
@@ -15,4 +16,5 @@ module.exports = async () => {
     handleStartStream(socket,pythonRunner,Device)
     handleStartCast(socket,pythonRunner,Device)
     handleStop(socket,pythonRunner,Device)
+    handleChangeName(socket,Device)
 } 

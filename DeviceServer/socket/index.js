@@ -11,6 +11,7 @@ const handleStop = require('./handleStop')
 const handleChangeName = require('./handleChangeName')
 const handleRebootDevice = require('./handleRebootDevice')
 const handleDisconnect = require('./handleDisconnect')
+
 module.exports = async() => {
     io.on('connection',async (device) => {
         io.emit('info',await Device.find())
@@ -23,6 +24,7 @@ module.exports = async() => {
         handleChangeName(io,device,Device) 
         handleRebootDevice(io,device,Device)
         handleDisconnect(io,device,Device)
+
     })
     app.post('/redirect',(req,res)=>{
         console.log('redirecting...')
