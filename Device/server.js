@@ -1,2 +1,2 @@
-const handleSocket = require('./handlers/handleSocket')
-handleSocket()
+const start = require('./sockets/index')
+start()

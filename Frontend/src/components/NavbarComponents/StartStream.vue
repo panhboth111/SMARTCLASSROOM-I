@@ -13,8 +13,15 @@
         </v-card-title>
         <v-card-text>
           <v-form ref="form">
-            <v-text-field
+            <!-- <v-text-field
               id="streamTitleInput"
+              label="Title"
+              color="black"
+              required
+              v-model="streamTitle"
+            ></v-text-field> -->
+            <v-text-field
+              id="title"
               label="Title"
               color="black"
               required
@@ -24,7 +31,7 @@
               id="owner"
               label="owner"
               color="black"
-              v-if="user.role === 'device'"
+              v-if="user.role === 'Device'"
               v-model="streamBy"
             ></v-text-field>
             <v-text-field
@@ -62,8 +69,8 @@
             text
             v-on="on"
             class="font-weight-black"
-            @click="user.role === 'Student' || user.role === 'device' || is_from_webcam ? startStream() : select_class = true"
-            id="startStreamBtn"
+            @click="user.role === 'Student' || user.role === 'Device' || is_from_webcam ? startStream() : select_class = true"
+            id="startBtn"
             :disabled="streamTitle === ''"
           >Continue</v-btn>
         </v-card-actions>
@@ -140,7 +147,7 @@
 </template>
 <script>
 import backend from "../../Service";
-import axios from "axios";
+//import axios from "axios";
 import io from "socket.io-client";
 
 export default {
@@ -212,11 +219,8 @@ export default {
     },
     getAvailableDevices() {
       this.socket.on("info", device_info => {
-        this.devices = device_info.filter(device => {
-          return (
-            device.online && device.cameraPlugged && device.streaming == "none"
-          );
-        });
+        this.devices = device_info.filter(device => device.online && !device.streaming && device.cameraPlugged)
+        console.log(this.devices)
       });
     },
     async deviceStartStream() {
@@ -224,17 +228,23 @@ export default {
       const deviceIds = [];
       const selectedClasses = this.devices.filter(x => x["value"] == true);
       selectedClasses.forEach(x => deviceIds.push(x.deviceId));
-      axios.post("http://10.10.15.11:3001/devices/startStreaming", {
-        deviceIds: deviceIds,
-        deviceId:
-          this.devices.filter(x => x["deviceName"] === this.selectedDevice)[0][
-            "deviceId"
-          ] || "None",
-        owner: this.user.name,
-        streamTitle: this.streamTitle,
-        description: this.description,
-        userEmail: this.user.email
-      });
+      // axios.post("http://10.10.15.11:3001/devices/startStreaming", {
+      //   deviceIds: deviceIds,
+      //   deviceId:
+      //     this.devices.filter(x => x["deviceName"] === this.selectedDevice)[0][
+      //       "deviceId"
+      //     ] || "None",
+      //   owner: this.user.name,
+      //   streamTitle: this.streamTitle,
+      //   description: this.description,
+      //   userEmail: this.user.email
+      // });
+      this.socket.emit('startStreaming',{deviceIds,
+        deviceId:this.devices.filter(x => x["deviceName"] === this.selectedDevice)[0]["deviceId"] || "None",
+        userEmail:this.user.email,
+        streamTitle:this.streamTitle,
+        description:this.description
+      })
       this.socket.on("redirect", async ({ streamBy, streamCode }) => {
         console.log(streamBy);
         console.log(this.user.email);

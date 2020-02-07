@@ -87,11 +87,12 @@
 import StartStream from "./StartStream";
 import auth from "../../auth";
 import backend from "../../Service";
-import axios from "axios";
+import io from "socket.io-client";
 
 export default {
   data: () => {
     return {
+      socket: io("http://10.10.15.11:3001"),
       stream_drawer: false,
       drawer: false,
       item: 1,
@@ -112,9 +113,7 @@ export default {
     stopStream() {
       console.log("stopping.......");
       backend.stopStream();
-      axios.post("http://10.10.15.11:3001/devices/stopStreaming", {
-        ownerName: this.user.name
-      });
+      this.socket.emit('stop',this.user.email)
     }
   },
   components: {

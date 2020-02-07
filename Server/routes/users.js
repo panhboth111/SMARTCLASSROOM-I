@@ -1,4 +1,5 @@
 const express = require('express')
+const axios = require('axios')
 const router = express.Router()
 const User = require("../models/user")
 const uID = require("../utilities/UniqueCode")
@@ -21,6 +22,7 @@ router.get("/user", verify , async (req, res) => {
 
 // Start stream
 router.post("/startStream", verify, async (req, res) => {
+    console.log("start")
     const owner = req.user.email
     const ownerName = req.user.name
     const {streamTitle,description,isPrivate,password} = req.body
@@ -55,6 +57,8 @@ router.post("/startStream", verify, async (req, res) => {
 
 // Device start stream
 router.post('/deviceStartStream',verify,async(req,res)=>{
+    console.log("device start")
+    console.log(req.body)
     const deviceEmail = req.user.email
     const {streamTitle,description,isPrivate,password,streamBy} = req.body
     const _U = await User.findOne({email:streamBy})
@@ -77,10 +81,9 @@ router.post('/deviceStartStream',verify,async(req,res)=>{
             streamFrom:deviceEmail
         })
         const savedStream = await newStream.save()
-        await User.updateOne({email:streamBy},{currentStream:streamCode})
-        await User.updateOne({email:streamBy},{isStreaming : true})
-        await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
-        axios.post('http://10.10.15.11:3001/devices/redirect',{streamBy,streamCode}).catch((er)=> console.log(er))
+        await User.updateOne({email:streamBy},{currentStream:streamCode,isStreaming:true})
+        //await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
+        axios.post('http://10.10.15.11:3001/redirect',{streamBy,streamCode}).catch((er)=> console.log(er))
         return res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
 
 
@@ -184,7 +187,7 @@ router.get("/stopStream", verify, async (req, res) => {
     const _S = await Streaming.findOne({owner})
     try{
         // Find the stream and set the active state to false
-        const result = await Streaming.updateOne({ owner , isActive : true },{ isActive : false })
+        const result = await Streaming.updateOne({ owner , isActive : true },{ isActive : false, currentStream:"none" })
         if (result.n >= 1){
             // Set isStreaming state of User to false
             const result2 = await User.updateOne({email:owner},{isStreaming : false})

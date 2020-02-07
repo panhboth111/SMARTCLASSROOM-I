@@ -8,7 +8,7 @@ const validate = require("validate.js")
 const verify = require("../utilities/VerifyToken")
 
 // Sign Up for an account
-router.post("/signUp", async (req , res ) => {
+router.post("/signUp", async (req , res) => {
     console.log(req.body)
     email = req.body.email.toLowerCase()
     name = req.body.name
@@ -21,10 +21,15 @@ router.post("/signUp", async (req , res ) => {
     else if(lectReg.test(email)) role = "Lecturer" 
     else if(devReg.test(email)) role = "Device"
     else return res.json({"message" : "Only KIT email is allowed","errCode" : "SU-001"})
+    console.log(role)
     await bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(password, salt, async (err, hash) => {
-            if (err) return res.json({err})
+            if (err) {
+                console.log(err)
+                return res.json({err})
+            }
             try{
+                console.log("trying...")
                 const user = new User({
                     email : email,
                     name : name

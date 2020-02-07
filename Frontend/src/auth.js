@@ -7,7 +7,7 @@ function auth() {
       window.location.replace("/home");
     }
   } else {
-    if (window.location.pathname != "/") {
+    if (window.location.pathname != "/" && window.location.pathname != '/device-login') {
       window.location.replace("/");
     }
   }

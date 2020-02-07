@@ -24,6 +24,10 @@ const schema = mongoose.Schema({
         type:Boolean,
         required:true
     },
+    usedBy:{
+        type:String,
+        default:""
+    }
 })
 
 module.exports = mongoose.model('Device',schema)

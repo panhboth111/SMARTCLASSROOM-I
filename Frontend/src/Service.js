@@ -1,6 +1,6 @@
 import axios from "axios";
 import cookie from "./cookie";
-const url = "http://10.10.15.11:3001/";
+const url = "http://10.10.15.11:3000/";
 
 class Service {
   // Get UserInfo
@@ -28,7 +28,7 @@ class Service {
   // Start Stream
   static startStream(streamTitle, description, isPrivate, password,streamBy,role) {
     const token = cookie.getCookie("auth-token");
-    const route = (role==='device')?'deviceStartStream':'startStream'
+    const route = (role==='Device')?'deviceStartStream':'startStream'
     console.log(streamTitle + description + isPrivate + password);
     return axios.post(
       `${url}users/${route}`,
@@ -36,8 +36,9 @@ class Service {
         streamTitle,
         description,
         isPrivate,
-        password,streamBy
-      },
+        password,
+        streamBy
+      },  
       { params: {}, headers: { "auth-token": token } }
     );
   }
@@ -96,6 +97,21 @@ class Service {
 
   // Post Data for login
   static async login(email, pwd) {
+    const credential = await axios.post(`${url}auth/login`, {
+      email,
+      pwd
+    });
+    const { token } = credential.data;
+    if (token) {
+      cookie.setCookie("auth-token", token, 30); //window.localStorage.setItem("auth-token",token)
+      localStorage.setItem("LastLogged", Date.now());
+      window.location.replace("/home");
+      return null;
+    } else {
+      return { message: credential.data.message };
+    }
+  }
+  static async deviceLogin(email, pwd) {
     const credential = await axios.post(`${url}auth/login`, {
       email,
       pwd

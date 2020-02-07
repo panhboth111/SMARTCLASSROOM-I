@@ -35,7 +35,8 @@ export default {
           });
         });
       }
-    }
+    },
+    
   },
   created() {
     this.getcurrentlyStreaming(6);
