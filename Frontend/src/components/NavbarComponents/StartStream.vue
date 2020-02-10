@@ -67,6 +67,14 @@
           <v-btn color="black darken-1" text @click="create_stream = false">Cancel</v-btn>
           <v-btn
             text
+            class="font-weight-black"
+            v-if="is_from_webcam && user.role !== 'Student'"
+            @click="select_classes = true"
+            :disabled="streamTitle === ''"
+          >Continue</v-btn>
+          <v-btn
+            v-else
+            text
             v-on="on"
             class="font-weight-black"
             @click="user.role === 'Student' || user.role === 'Device' || is_from_webcam ? startStream() : select_class = true"
@@ -95,51 +103,49 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="black darken-1" text @click="select_class = false">Cancel</v-btn>
+          <v-btn
+            text
+            @click="select_classes = true"
+            class="font-weight-black"
+            id="startStreamBtn"
+            :disabled="selectedDevice === ''"
+          >Continue</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-          <v-dialog v-model="select_classes" max-width="800px">
-            <template v-slot:activator="{ on }">
-              <v-btn
-                text
-                v-on="on"
-                class="font-weight-black"
-                id="startStreamBtn"
-                :disabled="selectedDevice === ''"
-              >Continue</v-btn>
-            </template>
-            <v-card>
-              <v-card-title>
-                <span class="title font-weight-regular">Setup</span>
-              </v-card-title>
-              <v-card-text>
-                <p class="my-2">Would you like to cast the stream to other rooms?</p>
-                <div class="checkboxes_overflow">
-                  <v-checkbox
-                    v-for="device in devices"
-                    :key="device.deviceId"
-                    class="mb-0 pb-0"
-                    color="black"
-                    v-model="device.value"
-                    :label="device.deviceName"
-                    :disabled="device.deviceName === selectedDevice"
-                  ></v-checkbox>
-                </div>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="black darken-1" text @click="select_classes = false">Cancel</v-btn>
-                <v-btn
-                  id="startBtn"
-                  color="black darken-1"
-                  class="font-weight-black"
-                  text
-                  @click="deviceStartStream()"
-                >Continue</v-btn>
-                <v-overlay :value="loading">
-                  <v-progress-circular indeterminate size="100"></v-progress-circular>
-                </v-overlay>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+    <v-dialog v-model="select_classes" max-width="800px">
+      <v-card>
+        <v-card-title>
+          <span class="title font-weight-regular">Setup</span>
+        </v-card-title>
+        <v-card-text>
+          <p class="my-2">Would you like to cast the stream to other rooms?</p>
+          <div class="checkboxes_overflow">
+            <v-checkbox
+              v-for="device in devices"
+              :key="device.deviceId"
+              class="mb-0 pb-0"
+              color="black"
+              v-model="device.value"
+              :label="device.deviceName"
+              :disabled="device.deviceName === selectedDevice"
+            ></v-checkbox>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="black darken-1" text @click="select_classes = false">Cancel</v-btn>
+          <v-btn
+            id="startBtn"
+            color="black darken-1"
+            class="font-weight-black"
+            text
+            @click="deviceStartStream()"
+          >Continue</v-btn>
+          <v-overlay :value="loading">
+            <v-progress-circular indeterminate size="100"></v-progress-circular>
+          </v-overlay>
         </v-card-actions>
       </v-card>
     </v-dialog>
