@@ -9,16 +9,16 @@ module.exports = async app => {
             const {roomName,roomOwner,roomId} = req.body
             await new Room({roomName,roomOwner,roomId}).save()
             console.log("room created")
-            res.send("done")
+            res.json({message:"hi"})
         } catch (error) {
-            console.log(err)
+            console.log(error)
         }
     })
     app.post('/getChat',async (req,res)=> {
         try {
             let roomId = req.body.roomId
             const Room_ = await Room.findOne({roomId})
-            res.json({chats:Room_.chats,questions:Room_.questions,announcement:Room_.announcement})
+            return res.json({chats:Room_.chats,questions:Room_.questions,announcement:Room_.announcement})
         } catch (error) {
             console.log(err)
         }

@@ -154,7 +154,7 @@ export default {
   data: () => ({
     loading: false,
     devices: [],
-    socket: io("http://10.10.15.11:3001"),
+    socket: io("http://10.10.17.15:3001"),
     selectedDevice: "",
     tag_list: [],
     create_stream: false,

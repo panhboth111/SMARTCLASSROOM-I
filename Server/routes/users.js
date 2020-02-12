@@ -82,14 +82,13 @@ router.post("/startStream", verify, async (req, res) => {
         })
         const savedStream = await newStream.save()
         await User.updateOne({email:owner},{isStreaming : true})
-        await axios.post('http://localhost:4000/createRoom',{roomName:streamTitle,roomOwner:owner,roomId:streamCode}).catch(er => console.log(er))
+        await axios.post('http://10.10.17.15:4000/createRoom',{roomName:streamTitle,roomOwner:owner,roomId:streamCode}).catch(er => console.log(er))
         console.log("done")
         return res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
     }catch (err){
         console.log(err)
         return res.json(err)
     }
-
 })
 
 // Device start stream
@@ -119,8 +118,9 @@ router.post('/deviceStartStream',verify,async(req,res)=>{
         })
         const savedStream = await newStream.save()
         await User.updateOne({email:streamBy},{currentStream:streamCode,isStreaming:true})
-        //await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
-        axios.post('http://10.10.15.11:3001/redirect',{streamBy,streamCode}).catch((er)=> console.log(er))
+        await axios.post('http://10.10.17.15:4000/createRoom',{roomName:streamTitle,roomOwner:streamBy,roomId:streamCode}).catch(er => console.log(er))
+        await axios.post('http://10.10.17.15:3001/redirect',{streamBy,streamCode}).catch((er)=> console.log(er))
+        console.log("doneeee")
         return res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
 
 
@@ -163,17 +163,18 @@ router.post("/joinStream", verify, async(req,res) => {
                 TOOLBAR_BUTTONS: [
                     'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
                     'fodeviceselection', 'profile',  'recording',"shortcuts",
-                    'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                     'etherpad', 'sharedvideo', 'settings', 'raisehand',
                     'videoquality', 'filmstrip', 'stats', 'shortcuts',
-                    'tileview', 'videobackgroundblur', 'download', 'help','info'
+                    'tileview', 'videobackgroundblur', 'download', 'help'
                 ],
                 SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
                 channelLastN: 1,
                 VERTICAL_FILMSTRIP: true,
-                SET_FILMSTRIP_ENABLED: false
-                
+                SET_FILMSTRIP_ENABLED: false,
+                MOBILE_APP_PROMO: false,
+                SHOW_CHROME_EXTENSION_BANNER: false
             }
             const options = {
                 roomName: streamCode,
@@ -196,8 +197,11 @@ router.post("/joinStream", verify, async(req,res) => {
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
                 VERTICAL_FILMSTRIP: false,
-                SET_FILMSTRIP_ENABLED: false
-                
+                SET_FILMSTRIP_ENABLED: false,
+                MOBILE_APP_PROMO: false,
+                DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+                DISABLE_PRESENCE_STATUS: true,
+                SHOW_CHROME_EXTENSION_BANNER: false
                 // filmStripOnly: true
             }
             const optionsStudents = {
@@ -252,8 +256,35 @@ router.post("/getCurrentlyStream", verify , async (req, res) => {
     }catch(err){
         return res.json(err)
     }
-
 })
+
+// Get offline stream
+router.post("/getOfflineStream", verify , async (req, res) => {
+    var limit = req.body.limit == null ? 0 : req.body.limit
+    try{
+        const offlineStreamings = await Streaming.find({isActive : false}).limit(limit).sort({date: -1});
+        return res.json(offlineStreamings)
+    }catch(err){
+        return res.json(err)
+    }
+})
+
+// Get stream by author
+router.post("/getStreamByAuthor", verify, async (req,res) => {
+    const {author} = req.body
+    var limit = req.body.limit == null ? 0 : req.body.limit
+    const name = author.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+    const emailReg = new RegExp(name + ".{0,}", "i")
+    console.log(emailReg)
+    try{
+        const streamByAuthor = await Streaming.find({ownerName : { $regex : emailReg } }).limit(limit).sort({date: -1});
+        console.log(streamByAuthor)
+        return res.json(streamByAuthor)
+    }catch(err){
+        return res.json(err)
+    }
+})
+
 // Get Stream Detials
 router.post("/getStreamDetail", verify , async (req, res) => {
     const streamCode = req.body.streamCode

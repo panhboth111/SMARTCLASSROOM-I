@@ -17,8 +17,11 @@ router.post("/signUp", async (req , res) => {
 
 
     let reg = /[a-z,.]{4,}\d{0,4}@kit.edu.kh/ig
+    let deviceReg = /device-[a-z,A-Z,0-9]{4}@device.com/
     if ( reg.test(email) ){
         role = "Student"
+    }else if (deviceReg.test(email)){
+        role = "Device"
     }else{
         return res.json({"message" : "Only KIT email is allowed","errCode" : "SU-001"})
     }
@@ -40,7 +43,6 @@ router.post("/signUp", async (req , res) => {
                     pwd : hash,
                     role : role
                 })
-
                 await user.save();
                 const savedCredential = await credential.save();
                 return res.json();

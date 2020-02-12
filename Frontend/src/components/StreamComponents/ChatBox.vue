@@ -97,6 +97,8 @@
             solo
             label="Send a message"
             ></v-text-field>-->
+
+
             <v-text-field
               color="black"
               filled
@@ -105,8 +107,10 @@
               type="text"
               append-icon="mdi-send"
               v-model="msg"
+              @keyup="setEmoji"
               @click:append="sendMessage()"
             ></v-text-field>
+            <p id="emojionearea"></P>
           </v-form>
         </v-container>
       </v-card-actions>
@@ -117,6 +121,7 @@
 <script>
 import io from "socket.io-client";
 import backend from "../../Service"
+import emojis from "emojis"
 // import emojiCo from "emoji-js"
 // import axios from 'axios'
 export default {
@@ -124,7 +129,7 @@ export default {
   data() {
     return {
       username: "",
-      socket: io("http://localhost:4000"),
+      socket: io("http://10.10.17.15:4000"),
       users: [],
       msg: "",
       tab: null,
@@ -150,6 +155,11 @@ export default {
           this.announcement = announcement;
         }
     },
+    // eslint-disable-next-line no-unused-vars
+    setEmoji(event){
+      // alert(event.keyCode)
+      this.msg = emojis.unicode(this.msg)
+    },
     getText() {
       const roomId = window.location.href.split("stream/")[1];
       this.socket.on(roomId, ({ chats, questions, announcement }) => {
@@ -170,13 +180,11 @@ export default {
     ,
     sendMessage() {
       const roomId = window.location.pathname.split("stream/")[1];
-      // let emoji = new emojiCo.EmojiConvertor()
 
-      // let emoText = emoji.replace_colons(this.msg);
       this.socket.emit("input", {
         username: this.user.name,
         email:this.user.email,
-        message: this.message,
+        message: this.msg,
         roomId
       });
       this.msg = "";

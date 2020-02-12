@@ -1,5 +1,5 @@
 const app = require('./app')
-const PORT = 3001 || process.env.PORT
+const PORT = 3001
 const database = require('./database')
 const server = app.listen(PORT,()=>{
     database.connect()

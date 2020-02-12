@@ -13,7 +13,7 @@ module.exports = async (io,device,Device) => {
             else{
                 console.log("new")
                 deviceId = await deviceUID()
-                await axios.post('http://localhost:3000/auth/signUp',{email:`device-${deviceId}@device.com`,name:deviceName,pwd:'12345678'})
+                await axios.post('http://10.10.17.15:3000/auth/signUp',{email:`device-${deviceId}@device.com`,name:deviceName,pwd:'12345678'})
                 await new Device({deviceName,deviceId,socketId:device.id,streaming,cameraPlugged,online:true}).save()
                 console.log("done")
                 device.emit('update_info',await Device.findOne({deviceId}))
