@@ -1,42 +1,41 @@
 <template>
   <v-container>
-    <h1 class="display-1 my-4">User Management</h1>
-    <v-simple-table>
-      <thead>
-        <tr>
-          <th class="text-left">UserId</th>
-          <th class="text-left">Username</th>
-          <th class="text-left">Email</th>
-          <th class="text-left">Role</th>
-          <th class="text-left">Settings</th>
+    <h1 class="display-1 mt-8 mb-10">User Management</h1>
+    <v-data-table
+      :items="users"
+      :headers="userHeaders"
+      class="elevation-1"
+    >
+      <template v-slot:item="props">
+        <tr @click="onUserClick(props.item)">
+          <td>{{ props.item.userId }}</td>
+          <td>{{ props.item.username }}</td>
+          <td>{{ props.item.userEmail }}</td>
+          <td>{{ props.item.role }}</td>
         </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in users" :key="user.userId">
-          <td>{{ user.userId }}</td>
-          <td>{{ user.username }}</td>
-          <td>{{ user.userEmail }}</td>
-          <td>{{ user.role }}</td>
-          <td>
-            <v-btn icon>
-              <v-icon dense>mdi-settings</v-icon>
-            </v-btn>
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
-    <v-row>
-      <v-col col="12">
-        <v-spacer></v-spacer>
-        <v-btn icon>
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
-        <span>Page 1</span>
-        <v-btn icon>
-          <v-icon>mdi-chevron-right</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
+      </template>
+    </v-data-table>
+
+    <v-dialog v-model="editUserModal" max-width="500px">
+      <v-card>
+        <v-card-title>Edit a user</v-card-title>
+        <v-card-text>
+          <v-text-field label="Username" v-model="userName"></v-text-field>
+          <v-text-field label="Email" v-model="userEmail"></v-text-field>
+          <v-select
+            label="Role"
+            :items="['Student', 'Lecturer', 'Admin', 'Device']"
+            v-model="userRole"
+          ></v-select>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="onUserSave()">Cancel</v-btn>
+          <v-btn text @click="onUserSave()">Delete</v-btn>
+          <v-btn text class="font-weight-bold" @click="onUserSave()">Save</v-btn>
+        </v-card-actions>
+      </v-card>      
+    </v-dialog>
   </v-container>
 </template>
 
@@ -45,6 +44,16 @@ export default {
   name: "user-management",
   data: () => {
     return {
+      userName: "",
+      userEmail: "",
+      userRole: "",
+      editUserModal: false,
+      userHeaders: [
+        {text: "id", value: "userId"},
+        {text: "Username", value: "username"},
+        {text: "Email", value: "userEmail"},
+        {text: "Role", value: "role"}
+      ],
       users: [
         {
           userId: 1,
@@ -108,6 +117,22 @@ export default {
         }
       ]
     };
+  },
+  methods: {
+    // On User Click
+    onUserClick(user){
+      this.userName = user.username
+      this.userEmail = user.userEmail,
+      this.userRole = user.role
+      this.editUserModal = true
+    },
+
+    // On User Save
+    onUserSave(){
+      this.userName = this.userEmail = this.userRole = ""
+      this.editUserModal = false
+    }
+    
   }
 };
 </script>
