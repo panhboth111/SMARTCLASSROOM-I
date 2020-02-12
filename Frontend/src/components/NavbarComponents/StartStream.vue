@@ -155,12 +155,13 @@
 import backend from "../../Service";
 //import axios from "axios";
 import io from "socket.io-client";
+import {URL} from "../../../config"
 
 export default {
   data: () => ({
     loading: false,
     devices: [],
-    socket: io("http://10.10.15.11:3001"),
+    socket: io(`http://${URL}:3001`),
     selectedDevice: "",
     tag_list: [],
     create_stream: false,
@@ -211,16 +212,6 @@ export default {
       );
       console.log("backk")
       this.user.isStreaming = stream.data.isStreaming;
-      // axios.post("http://10.10.15.11:5000/devices/startStreaming", {
-      //   streamTitle: this.streamTitle,S
-      //   description: this.description,
-      //   isPrivate: this.is_private,
-      //   deviceId: this.selectedDevice
-      // });
-      // axios.post("http://10.10.15.11:5000/devices/startProjecting", {
-      //   deviceIds: [],
-      //   streamBoxId: "meet"
-      // });
       this.start_stream = false;
       this.userCurrentStream = stream.data.streamCode;
       location.reload()
@@ -238,17 +229,6 @@ export default {
       const deviceIds = [];
       const selectedClasses = this.devices.filter(x => x["value"] == true);
       selectedClasses.forEach(x => deviceIds.push(x.deviceId));
-      // axios.post("http://10.10.15.11:3001/devices/startStreaming", {
-      //   deviceIds: deviceIds,
-      //   deviceId:
-      //     this.devices.filter(x => x["deviceName"] === this.selectedDevice)[0][
-      //       "deviceId"
-      //     ] || "None",
-      //   owner: this.user.name,
-      //   streamTitle: this.streamTitle,
-      //   description: this.description,
-      //   userEmail: this.user.email
-      // });
       this.socket.emit('startStreaming',{deviceIds,
         deviceId:this.devices.filter(x => x["deviceName"] === this.selectedDevice)[0]["deviceId"] || "None",
         userEmail:this.user.email,

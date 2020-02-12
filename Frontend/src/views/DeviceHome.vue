@@ -9,12 +9,12 @@
 <script>
 import backend from "../Service";
 import io from "socket.io-client";
-
+import {URL} from '../../config'
 export default {
   name: "device-home",
   data: () => {
     return {
-      socket: io("http://10.10.15.11:3001"),
+      socket: io(`http://${URL}:3001`),
       streams: []
     };
   },

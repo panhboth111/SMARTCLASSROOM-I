@@ -88,11 +88,12 @@ import StartStream from "./StartStream";
 import auth from "../../auth";
 import backend from "../../Service";
 import io from "socket.io-client";
+import {URL} from '../../../config'
 
 export default {
   data: () => {
     return {
-      socket: io("http://10.10.15.11:3001"),
+      socket: io(`http://${URL}:3001`),
       stream_drawer: false,
       drawer: false,
       item: 1,

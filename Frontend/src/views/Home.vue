@@ -12,6 +12,7 @@
 import backend from "../Service";
 import io from "socket.io-client";
 import OngoingStreams from "../components/HomePageComponents/OngoingStreams";
+import {URL} from '../../config'
 // I disabled these because it is not implemented as of right now
 
 // import PreviousVideos from "../components/HomePageComponents/PreviousVideos";
@@ -28,7 +29,7 @@ export default {
   },
   data: () => {
     return {
-      socket: io("http://10.10.15.11:3001"),
+      socket: io(`http://${URL}:3001`),
       streams: []
       // videos: [
       //   {

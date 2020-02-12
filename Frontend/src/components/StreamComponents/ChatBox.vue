@@ -117,12 +117,13 @@
 <script>
 import io from "socket.io-client";
 //import axios from 'axios'
+import {URL} from '../../../config'
 export default {
   name: "chatbox",
   data() {
     return {
       username: "",
-      socket: io("http://10.10.15.11:4000"),
+      socket: io(`http://${URL}:4000`),
       users: [],
       msg: "",
       tab: null,
