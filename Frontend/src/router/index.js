@@ -8,6 +8,7 @@ import DeviceManager from "../views/DeviceManager";
 import DeviceLogin from "../views/DeviceLogin";
 import DeviceHome from "../views/DeviceHome";
 import UserManagement from "../views/UserManagement";
+import StreamManagement from "../views/StreamManagement"
 
 Vue.use(VueRouter);
 
@@ -51,6 +52,11 @@ const routes = [
     path: "/user-management",
     name: "user-management",
     component: UserManagement
+  },
+  {
+    path: "/stream-management",
+    name: "stream-management",
+    component: StreamManagement
   }
 ];
 
