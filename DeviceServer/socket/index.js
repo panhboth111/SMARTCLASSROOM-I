@@ -30,5 +30,6 @@ module.exports = async() => {
         console.log('redirecting...')
         console.log(req.body)
         io.emit('redirect',req.body)
+        res.send("done")
     })
 }

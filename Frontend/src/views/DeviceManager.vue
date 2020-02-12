@@ -97,7 +97,7 @@ export default {
   name: "device-manager",
   data() {
     return {
-      socket: io("http://10.10.15.11:3001"),
+      socket: io("http://10.10.17.15:3001"),
       editDevice: false,
       devices: [],
       deviceId: "",
@@ -113,7 +113,7 @@ export default {
     },  
     editDeviceName() {
       this.editDevice = false;
-      axios.put("http://10.10.15.11:3001/devices/changeName", {
+      axios.put("http://10.10.17.15:3001/devices/changeName", {
         deviceId: this.deviceId,
         deviceName: this.deviceName
       });

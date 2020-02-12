@@ -92,7 +92,7 @@ import io from "socket.io-client";
 export default {
   data: () => {
     return {
-      socket: io("http://10.10.15.11:3001"),
+      socket: io("http://10.10.17.15:3001"),
       stream_drawer: false,
       drawer: false,
       item: 1,
