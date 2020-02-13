@@ -173,6 +173,19 @@ class Service {
     cookie.setCookie("auth-token", "", 30);
     localStorage.setItem("LastLogged", Date.now());
   }
+
+  // Get All Chats
+  static async getAllChat(roomId){
+    const chat = await axios.post(`http://localhost:4000/getChat`, {
+      roomId
+    });
+    if (chat.data != undefined){
+      console.log(chat)
+      return {chats : chat.data.chats, questions : chat.data.questions, announcement : chat.data.announcement}
+    }else{
+      return null
+    }
+  }
 }
 
 export default Service;

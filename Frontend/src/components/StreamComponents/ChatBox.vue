@@ -60,8 +60,8 @@
             <v-card flat>
               <div class="px-3">
                 <div v-for="message in chats" :key="message._id" class="message pb-1">
-                  <span class="font-weight-bold">{{message.username}}</span> -
-                  <span>{{message.message}}</span>
+                  <span class="font-weight-bold" >{{message.username}}</span> -
+                  <span v-html="message.message"></span>
                 </div>
               </div>
             </v-card>
@@ -97,6 +97,8 @@
             solo
             label="Send a message"
             ></v-text-field>-->
+
+
             <v-text-field
               color="black"
               filled
@@ -105,8 +107,10 @@
               type="text"
               append-icon="mdi-send"
               v-model="msg"
+              @keyup="setEmoji"
               @click:append="sendMessage()"
             ></v-text-field>
+            <p id="emojionearea"></P>
           </v-form>
         </v-container>
       </v-card-actions>
@@ -116,14 +120,16 @@
 
 <script>
 import io from "socket.io-client";
-//import axios from 'axios'
-import {URL} from '../../../config'
+import backend from "../../Service"
+import emojis from "emojis"
+// import emojiCo from "emoji-js"
+// import axios from 'axios'
 export default {
   name: "chatbox",
   data() {
     return {
       username: "",
-      socket: io(`http://${URL}:4000`),
+      socket: io("http://10.10.17.15:4000"),
       users: [],
       msg: "",
       tab: null,
@@ -136,15 +142,45 @@ export default {
     user: Object
   },
   methods: {
-    getAllChat() {
-      this.socket.on("messages", ({ chats, questions, announcement }) => {
-        this.chats = chats;
-        this.questions = questions;
-        this.announcement = announcement;
-      });
+    async getAllChat() {
+      const roomId = window.location.href.split("stream/")[1]
+      const { chats, questions, announcement } = await backend.getAllChat(roomId)    
+        if (chats != undefined){
+          this.chats = chats
+        }
+        if(questions != undefined){
+          this.questions = questions
+        }
+        if(announcement != undefined){
+          this.announcement = announcement;
+        }
     },
+    // eslint-disable-next-line no-unused-vars
+    setEmoji(event){
+      // alert(event.keyCode)
+      this.msg = emojis.unicode(this.msg)
+    },
+    getText() {
+      const roomId = window.location.href.split("stream/")[1];
+      this.socket.on(roomId, ({ chats, questions, announcement }) => {
+        if (chats != undefined){
+          this.chats.push(chats)
+        }
+        if(questions != undefined){
+          this.questions.push(questions)
+        }
+        if(announcement != undefined){
+          this.announcement = announcement;
+        }
+        // console.log(chats)
+          console.log(this.chats)
+
+      });
+    }
+    ,
     sendMessage() {
-      const roomId = window.location.href.split("stream/");
+      const roomId = window.location.pathname.split("stream/")[1];
+
       this.socket.emit("input", {
         username: this.user.name,
         email:this.user.email,
@@ -153,44 +189,10 @@ export default {
       });
       this.msg = "";
     }
-    // joinServer() {
-    //   this.socket.on("logged-in", data => {
-    //     this.messages = data.messages;
-    //     this.users = data.users;
-    //     this.socket.emit("new-user", this.username);
-    //   });
-    //   this.listen();
-    // },
-    // listen() {
-    //   this.socket.on("user-online", user => {
-    //     this.users.push(user);
-    //   });
-    //   this.socket.on("user-left", user => {
-    //     this.users.splice(this.users.indexOf(user), 1);
-    //   });
-    //   this.socket.on("msg", message => {
-    //     this.messages.push(message);
-    //   });
-    // },
-    // sendMessage() {
-    //   if (!this.msg) {
-    //     // console.log('No Message')
-    //     return;
-    //   }
-    //   // console.log(this.msg)
-    //   this.socket.emit("msg", this.msg);
-    //   this.msg = "";
-    // }
+    
   },
   mounted() {
-    // var d = document.getElementById("messageBody");
-    // d.scrollTop = d.scrollHeight;
-    this.getAllChat();
-    // this.username = prompt("What is your username?", "[Anonymous]");
-    // if (!this.username) {
-    //   this.username = "[Anonymous]";
-    // }
-    // this.joinServer();
+    this.getText();
   },
   created() {
     this.getAllChat();
