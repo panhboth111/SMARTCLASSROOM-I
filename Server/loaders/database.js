@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const DB_CONNECTION = 'mongodb://localhost:27017/testing1' || process.env.DB_CONNECTION 
+const DB_CONNECTION = 'mongodb://localhost:27017/SeverTest1' || process.env.DB_CONNECTION 
 
 module.exports = {
     mongoose,

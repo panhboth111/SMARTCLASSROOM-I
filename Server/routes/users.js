@@ -5,15 +5,16 @@ const User = require("../models/user")
 const uID = require("../utilities/UniqueCode")
 const verify = require("../utilities/VerifyToken")
 const Streaming = require('../models/streaming')
+const Credential = require('../models/credential')
 
 
 // Get all user info
-router.get("/allUser", verify , async (req, res) => {
+router.get("/allUsers", verify , async (req, res) => {
     const role = req.user.role
-    const email = req.user.email
+    const owner = req.user.email
     adminReg = /admin/i
     if (adminReg.test(role)){
-        users = await User.find({email : {$ne : email} })
+        const users = await User.find({email : {$ne : owner} , role : {$ne : "Admin"} },{"email":1,"name":1,"role":1})
         return res.json(users);
     }else{
         return res.json({message : "You are not authorized!", errCode : "AU-001"})
@@ -24,31 +25,32 @@ router.get("/allUser", verify , async (req, res) => {
 router.get("/user", verify , async (req, res) => {
     const email = req.user.email
     const user = await User.findOne({email})
-    const {name,isStreaming} = user
-    const _user = {
-        email,
-        name,
-        isStreaming,
-        role:req.user.role
-    }
-    return res.json(_user)
+    // const {name,isStreaming} = user
+    // const _user = {
+    //     email,
+    //     name,
+    //     isStreaming,
+    //     role:req.user.role
+    // }
+    return res.json(user)
 })
 
 // Changer user role
-router.get("/changeRole", verify, async(req, res) => {
+router.post("/changeRole", verify, async(req, res) => {
+    console.log("Recieve Route")
     email = req.user.email
     role = req.user.role
     targetUser = req.body.email
     targetRole = req.body.role
-
+    console.log(targetRole + targetUser)
     roleReg = /admin/i
 
     if (roleReg.test(role)){
-        update = await Credential.updateOne({role : targetRole},{email : targetUser})
+        update = await User.updateOne({email : targetUser},{role : targetRole})
         if (update.n > 0){
             return res.json({"message" : "Success fully update user '" + targetUser + "' to '"+ targetRole +"'" })
         }else{
-            return res.json({"messgage" : "An error occurred during role changing process"})
+            return res.json({"messgage" : "An error occurred during role changing process", "errCode":"CR-002"})
         }
     }else{
         return res.json({"message" : "You are not authorized to performed the following task", "errCode":"CR-001"})
@@ -57,9 +59,19 @@ router.get("/changeRole", verify, async(req, res) => {
 
 // Start stream
 router.post("/startStream", verify, async (req, res) => {
+
     console.log("start")
     const owner = req.user.email
     const ownerName = req.user.name
+
+    const user = await User.findOne({email : owner})
+    if (user.isStreaming) {
+        return res.json({"message" : "Stream is already initialized", "errCode" : "SS-001"})
+    }else{
+        await User.updateOne({email : owner},{isStreaming : true})
+    }
+
+
     const {streamTitle,description,isPrivate,password} = req.body
     try{
         console.log("tryingggg")
@@ -120,7 +132,7 @@ router.post('/deviceStartStream',verify,async(req,res)=>{
         const savedStream = await newStream.save()
         await User.updateOne({email:streamBy},{currentStream:streamCode,isStreaming:true})
         //await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
-        axios.post('http://10.10.15.11:3001/redirect',{streamBy,streamCode}).catch((er)=> console.log(er))
+        axios.post('http://10.10.17.15:3001/redirect',{streamBy,streamCode}).catch((er)=> console.log(er))
         return res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
 
 
@@ -221,10 +233,10 @@ router.post("/joinStream", verify, async(req,res) => {
 // Stop stream
 router.get("/stopStream", verify, async (req, res) => {
     const owner = req.user.email
-    const _S = await Streaming.findOne({owner})
+    
     try{
         // Find the stream and set the active state to false
-        const result = await Streaming.updateOne({ owner , isActive : true },{ isActive : false, currentStream:"none" })
+        const result = await Streaming.updateMany({ owner , isActive : true },{ isActive : false })
         if (result.n >= 1){
             // Set isStreaming state of User to false
             const result2 = await User.updateOne({email:owner},{isStreaming : false})
