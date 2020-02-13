@@ -9,7 +9,7 @@
 
 <script>
 import Navbar from "./components/NavbarComponents/Navbar";
-import backend from "./Service";
+// import backend from "./Service";
 import auth from "./auth";
 import synclog from "./synclog";
 
@@ -17,12 +17,12 @@ export default {
   name: "App",
   methods: {
     async getUser() {
-      const user = await backend.getUserInfo();
-      this.user.name = user.data.name;
-      this.user.role = user.data.role;
-      this.user.isStreaming = user.data.isStreaming;
-      this.user.currentStream = user.data.currentStream;
-      this.user.email = user.data.email;
+      // const user = await backend.getUserInfo();
+      // this.user.name = user.data.name;
+      // this.user.role = user.data.role;
+      // this.user.isStreaming = user.data.isStreaming;
+      // this.user.currentStream = user.data.currentStream;
+      // this.user.email = user.data.email;
     }
   },
   components: {
@@ -32,7 +32,7 @@ export default {
   data: () => ({
     user: {
       name: "",
-      role: "Lecturer",
+      role: "",
       isStreaming: false
     }
   }),
