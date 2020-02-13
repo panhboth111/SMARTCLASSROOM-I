@@ -9,7 +9,6 @@ const verify = require("../utilities/VerifyToken")
 
 // Sign Up for an account
 router.post("/signUp", async (req , res) => {
-    console.log(req.body)
     email = req.body.email.toLowerCase()
     name = req.body.name
     password = req.body.pwd
@@ -17,9 +16,13 @@ router.post("/signUp", async (req , res) => {
 
 
     let reg = /[a-z,.]{4,}\d{0,4}@kit.edu.kh/ig
+    let Devreg = /device-[A-Z,a-z,0-9]{4}@device.com/ig
     if ( reg.test(email) ){
         role = "Student"
-    }else{
+    }else if (Devreg.test(email)){
+        role = "Device"
+    }
+    else{
         return res.json({"message" : "Only KIT email is allowed","errCode" : "SU-001"})
     }
 
@@ -30,20 +33,19 @@ router.post("/signUp", async (req , res) => {
                 return res.json({err})
             }
             try{
-                console.log("trying...")
                 const user = new User({
                     email : email,
-                    name : name
+                    name : name,
+                    role : role
                 });
                 const credential = new Credential({
                     email : email,
-                    pwd : hash,
-                    role : role
+                    pwd : hash
                 })
 
                 await user.save();
-                const savedCredential = await credential.save();
-                return res.json();
+                await credential.save();
+                return res.json({"message" : "Account registered as successfully!"});
             }catch(err){
                 console.log(err)
                 if (err.code == 11000){
@@ -61,8 +63,6 @@ router.post("/signUp", async (req , res) => {
 router.post("/login", async (req , res ) => {
     const email = req.body.email
     const password = req.body.pwd
-    console.log("New Login from : "+email)
-    // console.log(email + " " + pwd)
 
     const constraint = {
         email : {
@@ -96,7 +96,8 @@ router.post("/login", async (req , res ) => {
         if (err) return res.json({err})
         if (isMatch){ // if the pwd matches 
             // Sign the token
-            const token = jwt.sign({email : email, name: user.name, role:existUser.role}, process.env.TOKEN_SECRET)
+            const token = jwt.sign({email : email, name: user.name, role:user.role}, process.env.TOKEN_SECRET)
+            console.log("New Login from : "+email)
             //Put token in the header
             return res.header("auth-token",token).json({"message" : "Login Success", "token" : token})
         }else{ // if the pwd is not match

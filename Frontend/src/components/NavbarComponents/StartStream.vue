@@ -143,7 +143,7 @@
             text
             @click="stream()"
           >Continue</v-btn>
-          <v-overlay :value="loading">
+          <v-overlay :value="loading" v-if="devices">
             <v-progress-circular indeterminate size="100"></v-progress-circular>
           </v-overlay>
         </v-card-actions>

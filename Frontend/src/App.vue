@@ -17,12 +17,24 @@ export default {
   name: "App",
   methods: {
     async getUser() {
+<<<<<<< HEAD
       // const user = await backend.getUserInfo();
       // this.user.name = user.data.name;
       // this.user.role = user.data.role;
       // this.user.isStreaming = user.data.isStreaming;
       // this.user.currentStream = user.data.currentStream;
       // this.user.email = user.data.email;
+=======
+      const user = await backend.getUserInfo();
+      this.user.name = user.data.name;
+      this.user.role = user.data.role;
+      this.user.isStreaming = user.data.isStreaming;
+      this.user.currentStream = user.data.currentStream;
+      this.user.email = user.data.email;
+    },
+    async redirectUnauthorized(){
+      if(window.location.pathname === '/devices' && (this.user.role !== 'Admin' || this.user.role !== 'Lecturer')) window.location.replace('/')
+>>>>>>> 7857ed834581442826f502512451f5b522a2b43c
     }
   },
   components: {
@@ -38,6 +50,7 @@ export default {
   }),
 
   created() {
+    this.redirectUnauthorized();
     this.getUser();
     auth();
     synclog;
