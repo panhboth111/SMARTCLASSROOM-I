@@ -39,6 +39,7 @@ import backend from '../Service'
 
 export default {
     data: () => ({
+        streamCode : "",
         streamTitle: "",
         description: "",
         editStreamModal: false,
@@ -57,13 +58,22 @@ export default {
         onStreamClick(stream) {
             this.streamTitle = stream.streamTitle
             this.description = stream.description
+            this.streamCode = stream.streamCode
+
+
             this.editStreamModal = true   
         },
 
         // On Stream Save
-        onStreamSave(){
-            this.streamTitle = this.streamType = this.streamFrom = this.streamTo = ""
-            this.editStreamModal = false
+        async onStreamSave(){
+            const result = await backend.editStream(this.streamCode, this.streamTitle, this.description)
+            if (result.errCode){
+              alert(result.message)
+            }else{
+              this.streamTitle = this.description = this.streamCode = ""
+              this.getAllStream()
+              this.editStreamModal = false
+            }
         },
         async getAllStream(){
           const streams = await backend.getCurrentlyStreaming(6)
