@@ -10,7 +10,7 @@ const verify = require("../utilities/VerifyToken")
 // Sign Up for an account
 router.post("/signUp", async (req , res) => {
     email = req.body.email.toLowerCase()
-    name = req.body.name
+    name = req.body.name.trim()
     password = req.body.pwd
     role = ""
 

@@ -129,13 +129,6 @@ export default {
         console.log(this.devices);
       });
     },  
-    // editDeviceName() {
-    //   this.editDevice = false;
-    //   axios.put(`http://10.10.15.11:3001/devices/changeName`, {
-    //     deviceId: this.deviceId,
-    //     deviceName: this.deviceName
-    //   });
-    // },
     rebootDevice() {
       console.log("Rebooting");
     }
