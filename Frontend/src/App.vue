@@ -23,6 +23,9 @@ export default {
       this.user.isStreaming = user.data.isStreaming;
       this.user.currentStream = user.data.currentStream;
       this.user.email = user.data.email;
+    },
+    async redirectUnauthorized(){
+      if(window.location.pathname === '/devices' && (this.user.role !== 'Admin' || this.user.role !== 'Lecturer')) window.location.replace('/')
     }
   },
   components: {
@@ -32,12 +35,13 @@ export default {
   data: () => ({
     user: {
       name: "",
-      role: "Lecturer",
+      role: "",
       isStreaming: false
     }
   }),
 
   created() {
+    this.redirectUnauthorized();
     this.getUser();
     auth();
     synclog;
