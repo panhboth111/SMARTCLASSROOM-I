@@ -9,6 +9,10 @@ const schema = mongoose.Schema({
         type : String,
         require : true
     },
+    role : {
+        type : String,
+        default : "Student"
+    },
     isStreaming : {
         type : Boolean,
         default : false

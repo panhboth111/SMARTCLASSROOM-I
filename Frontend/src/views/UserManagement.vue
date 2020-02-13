@@ -8,9 +8,9 @@
     >
       <template v-slot:item="props">
         <tr @click="onUserClick(props.item)">
-          <td>{{ props.item.userId }}</td>
-          <td>{{ props.item.username }}</td>
-          <td>{{ props.item.userEmail }}</td>
+          <!-- <td>{{ props.item.userId }}</td> -->
+          <td>{{ props.item.name }}</td>
+          <td>{{ props.item.email }}</td>
           <td>{{ props.item.role }}</td>
         </tr>
       </template>
@@ -21,10 +21,10 @@
         <v-card-title>Edit a user</v-card-title>
         <v-card-text>
           <v-text-field label="Username" v-model="userName"></v-text-field>
-          <v-text-field label="Email" v-model="userEmail"></v-text-field>
+          <v-text-field label="Email" v-model="userEmail" disabled></v-text-field>
           <v-select
             label="Role"
-            :items="['Student', 'Lecturer', 'Admin', 'Device']"
+            :items="['Student', 'Lecturer', 'Admin']"
             v-model="userRole"
           ></v-select>
         </v-card-text>
@@ -40,6 +40,8 @@
 </template>
 
 <script>
+// eslint-disable-next-line no-unused-vars
+import backend from '../Service'
 export default {
   name: "user-management",
   data: () => {
@@ -49,72 +51,11 @@ export default {
       userRole: "",
       editUserModal: false,
       userHeaders: [
-        {text: "id", value: "userId"},
         {text: "Username", value: "username"},
         {text: "Email", value: "userEmail"},
         {text: "Role", value: "role"}
       ],
       users: [
-        {
-          userId: 1,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        },
-        {
-          userId: 2,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        },
-        {
-          userId: 3,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        },
-        {
-          userId: 4,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        },
-        {
-          userId: 5,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        },
-        {
-          userId: 6,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        },
-        {
-          userId: 7,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        },
-        {
-          userId: 8,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        },
-        {
-          userId: 9,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        },
-        {
-          userId: 10,
-          username: "Vira",
-          userEmail: "lychunvira@gmail.com",
-          role: "Student"
-        }
       ]
     };
   },
@@ -128,11 +69,29 @@ export default {
     },
 
     // On User Save
-    onUserSave(){
-      this.userName = this.userEmail = this.userRole = ""
-      this.editUserModal = false
+    async onUserSave(){
+      const result = await backend.changeRole(this.userEmail,this.userRole)
+      if (result.errCode){
+        alert(result.message)
+      }else{
+        this.userName = this.userEmail = this.userRole = ""
+        this.getAllUsers()
+        this.editUserModal = false
+
+      }
+    },
+
+    // Get All User 
+    async getAllUsers(){
+      //this.users = await backend.getAllUsers().data
+      let _users = await backend.getAllUsers()
+      _users = _users.data
+      this.users = [..._users].filter(_user => _user.role !== "Device")
     }
     
+  },
+  created(){
+    this.getAllUsers()
   }
 };
 </script>

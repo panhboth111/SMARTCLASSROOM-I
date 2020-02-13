@@ -1,6 +1,6 @@
 import axios from "axios";
 import cookie from "./cookie";
-import {URL} from '../config'
+import { URL } from '../config'
 const url = `http://${URL}:3000/`;
 
 class Service {
@@ -12,7 +12,16 @@ class Service {
       headers: { "auth-token": token }
     });
   }
- 
+
+  // Get Users info
+  static getAllUsers() {
+    const token = cookie.getCookie("auth-token");
+    return axios.get(`${url}users/allUsers`, {
+      params: {},
+      headers: { "auth-token": token }
+    });
+  }
+
   // Start Stream
   static getCurrentlyStreaming(limit) {
     const token = cookie.getCookie("auth-token");
@@ -27,10 +36,10 @@ class Service {
   }
 
   // Start Stream
-  static startStream(streamTitle, description, isPrivate, password,streamBy,role) {
+  static startStream(streamTitle, description, isPrivate, password, streamBy, role) {
     console.log("Start")
     const token = cookie.getCookie("auth-token");
-    const route = (role==='Device')?'deviceStartStream':'startStream'
+    const route = (role === 'Device') ? 'deviceStartStream' : 'startStream'
     console.log(streamTitle + description + isPrivate + password);
     return axios.post(
       `${url}users/${route}`,
@@ -40,7 +49,7 @@ class Service {
         isPrivate,
         password,
         streamBy
-      },  
+      },
       { params: {}, headers: { "auth-token": token } }
     );
   }
@@ -72,7 +81,7 @@ class Service {
       params: {},
       headers: { "auth-token": token }
     });
-    
+
     if (result.data.status) {
       window.location.replace("/home");
     }
@@ -95,6 +104,21 @@ class Service {
       pwd,
       name
     });
+  }
+
+  // Change userRole
+
+  static async changeRole(email, role) {
+    const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
+    const result = await axios.post(`${url}users/changeRole`, {
+      email,
+      role
+    }, {
+      params: {},
+      headers: { "auth-token": token }
+    });
+
+    return result.data
   }
 
   // Post Data for login

@@ -56,6 +56,11 @@
                 <v-list-item-title v-text="'Stream Management'"></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item router to="/user-management" v-if="user.role == 'Admin'">
+              <v-list-item-content>
+                <v-list-item-title v-text="'User Management'"></v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list-item-group>
         </v-list>
       </template>
@@ -79,7 +84,8 @@ export default {
       item: 1,
       items: [
         { text: "Home", route: "/home" },
-        { text: "Device Manager", route: "/devices" }
+        { text: "Device Manager", route: "/devices" },
+        { text: "User", route: "/user-management" }
       ]
     };
   },
