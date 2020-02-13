@@ -8,12 +8,11 @@
         >
       <template v-slot:item="props">
         <tr @click="onStreamClick(props.item)">
-          <td>{{ props.item.streamId }}</td>
+          <td>{{ props.item.streamCode }}</td>
           <td>{{ props.item.streamTitle }}</td>
-          <td>{{ props.item.streamAuthor }}</td>
-          <td>{{ props.item.type }}</td>
-          <td>{{ props.item.from }}</td>
-          <td>{{ props.item.to }}</td>
+          <td>{{ props.item.ownerName }}</td>
+          <td>{{ props.item.description }}</td>
+          <td>{{ props.item.streamFrom }}</td>
         </tr>
       </template>
     </v-data-table>
@@ -22,22 +21,7 @@
         <v-card-title>Edit a stream</v-card-title>
         <v-card-text>
           <v-text-field label="Title" v-model="streamTitle"></v-text-field>
-          <v-select
-            label="Type"
-            :items="['Public', 'Private']"
-            v-model="streamType"
-          ></v-select>
-          <v-select
-            label="Streaming from"
-            :items="['Classroom 1', 'Classroom 2', 'Classroom 3']"
-            v-model="streamFrom"
-          ></v-select>
-          <v-select
-            label="Streaming to"
-            :items="['Classroom 1', 'Classroom 2', 'Classroom 3']"
-            v-model="streamTo"
-          ></v-select>
-          
+          <v-text-field label="Description" v-model="description"></v-text-field>          
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -51,71 +35,28 @@
 </template>
 
 <script>
+import backend from '../Service'
+
 export default {
     data: () => ({
         streamTitle: "",
-        streamType: "",
-        streamFrom: "",
-        streamTo: "",
+        description: "",
         editStreamModal: false,
         streamHeaders: [
-            {text: "id", value: "streamId"},
+            {text: "Stream Code", value: "streamCode"},
             {text: "Title", value: "streamTitle"},
             {text: "Author", value: "streamAuthor"},
-            {text: "Type", value: "type"},
+            {text: "Description", value: "description"},
             {text: "From", value: "from"},
-            {text: "To", value: "to"},
         ],
         streams: [
-            {
-                streamId: 1,
-                streamTitle: "Introduction to Python",
-                streamAuthor: "Hun Vikran",
-                type: "Public",
-                from: "Classroom 1",
-                to: "Classroom 2"
-            },
-            {
-                streamId: 2,
-                streamTitle: "Introduction to Python",
-                streamAuthor: "Hun Vikran",
-                type: "Public",
-                from: "Classroom 1",
-                to: "Classroom 2"
-            },
-            {
-                streamId: 3,
-                streamTitle: "Introduction to Python",
-                streamAuthor: "Hun Vikran",
-                type: "Public",
-                from: "Classroom 1",
-                to: "Classroom 2"
-            },
-            {
-                streamId: 4,
-                streamTitle: "Introduction to Python",
-                streamAuthor: "Hun Vikran",
-                type: "Public",
-                from: "Classroom 1",
-                to: "Classroom 2"
-            },
-            {
-                streamId: 5,
-                streamTitle: "Introduction to Python",
-                streamAuthor: "Hun Vikran",
-                type: "Public",
-                from: "Classroom 1",
-                to: "Classroom 2"
-            }
         ]
     }),
     methods: {
         // On Stream Click
         onStreamClick(stream) {
             this.streamTitle = stream.streamTitle
-            this.streamType = stream.type
-            this.streamFrom = stream.from
-            this.streamTo = stream.to
+            this.description = stream.description
             this.editStreamModal = true   
         },
 
@@ -123,7 +64,15 @@ export default {
         onStreamSave(){
             this.streamTitle = this.streamType = this.streamFrom = this.streamTo = ""
             this.editStreamModal = false
+        },
+        async getAllStream(){
+          const streams = await backend.getCurrentlyStreaming(6)
+          console.log(streams.data)
+          this.streams = streams.data
         }
+    },
+    created(){
+      this.getAllStream()
     }
 }
 </script>

@@ -39,7 +39,7 @@ const schema = mongoose.Schema({
     },
     streamFrom: {
         type:String,
-        default: "none"
+        default: "Author's cam"
     }
 })
 

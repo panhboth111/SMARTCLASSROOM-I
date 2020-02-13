@@ -109,6 +109,7 @@ router.post('/deviceStartStream',verify,async(req,res)=>{
     console.log("device start")
     console.log(req.body)
     const deviceEmail = req.user.email
+    const deviceName = req.user.name
     const {streamTitle,description,isPrivate,password,streamBy} = req.body
     const _U = await User.findOne({email:streamBy})
     try{
@@ -124,6 +125,7 @@ router.post('/deviceStartStream',verify,async(req,res)=>{
             streamTitle,
             description,
             isPrivate,
+            streamFrom:deviceName,
             password,
             owner:streamBy,
             ownerName:_U.name,
@@ -169,7 +171,7 @@ router.post("/joinStream", verify, async(req,res) => {
         }
 
         // Check ownership
-        if ((theStream.owner === email && theStream.streamFrom == 'none') || (theStream.streamFrom === email)){ // Owner
+        if ((theStream.owner === email && theStream.streamFrom == "Author's cam") || (theStream.streamFrom === email)){ // Owner
             // For Streamer/Lecturer
             const interfaceConfigLecturer = {
                 TOOLBAR_BUTTONS: [
