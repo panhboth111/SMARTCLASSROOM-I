@@ -51,7 +51,6 @@ export default {
       userRole: "",
       editUserModal: false,
       userHeaders: [
-        // {text: "id", value: "userId"},
         {text: "Username", value: "username"},
         {text: "Email", value: "userEmail"},
         {text: "Role", value: "role"}
@@ -60,14 +59,11 @@ export default {
       ]
     };
   },
-    props: {
-    user: Object
-  },
   methods: {
     // On User Click
     onUserClick(user){
-      this.userName = user.name
-      this.userEmail = user.email,
+      this.userName = user.username
+      this.userEmail = user.userEmail,
       this.userRole = user.role
       this.editUserModal = true
     },

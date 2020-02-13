@@ -46,16 +46,34 @@
             </v-col>
             <v-col cols="2" class="d-flex justify-end align-center">
               <div class="mr-5">
-                <v-btn icon @click="deviceId = device.deviceId; rebootDevice()">
-                  <v-icon>mdi-power</v-icon>
-                </v-btn>
-                <v-btn
-                  icon
-                  @click.stop="deviceId = device.deviceId; editDevice = true"
-                  v-if="user.role === 'Admin' && device.streaming === 'none'"
-                >
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{on}">
+                    <v-btn icon @click="deviceId = device.deviceId; rebootDevice()" v-on="on">
+                      <v-icon>mdi-power</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Reboot device</span>
+                </v-tooltip>
+                <v-tooltip bottom v-if="user.role === 'Admin'">
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      icon
+                      @click.stop="deviceId = device.deviceId; editDevice = true"
+                      v-on="on"
+                      >
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Edit device</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-icon>mdi-record</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Stop stream</span>
+                </v-tooltip>
               </div>
             </v-col>
           </v-row>
