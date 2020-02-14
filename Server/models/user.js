@@ -16,10 +16,6 @@ const schema = mongoose.Schema({
     isStreaming : {
         type : Boolean,
         default : false
-    },
-    currentStream :{
-        type:String,
-        default:""
     }
 })
 

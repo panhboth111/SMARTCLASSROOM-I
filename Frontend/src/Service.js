@@ -74,6 +74,21 @@ class Service {
     }
   }
 
+  // Edit Stream
+  static async editStream(streamCode,streamTitle,description){
+    const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
+    const result = await axios.post(`${url}users/editstream`, {
+      streamCode,
+      streamTitle,
+      description
+    }, {
+      params: {},
+      headers: { "auth-token": token }
+    });
+
+    return result.data
+  }
+
   // Stop stream
   static async stopStream() {
     const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
@@ -107,7 +122,6 @@ class Service {
   }
 
   // Change userRole
-
   static async changeRole(email, role) {
     const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
     const result = await axios.post(`${url}users/changeRole`, {
@@ -137,6 +151,7 @@ class Service {
       return { message: credential.data.message };
     }
   }
+
   static async deviceLogin(email, pwd) {
     const credential = await axios.post(`${url}auth/login`, {
       email,
@@ -157,6 +172,19 @@ class Service {
   static async logout() {
     cookie.setCookie("auth-token", "", 30);
     localStorage.setItem("LastLogged", Date.now());
+  }
+
+  // Get All Chats
+  static async getAllChat(roomId){
+    const chat = await axios.post(`http://localhost:4000/getChat`, {
+      roomId
+    });
+    if (chat.data != undefined){
+      console.log(chat)
+      return {chats : chat.data.chats, questions : chat.data.questions, announcement : chat.data.announcement}
+    }else{
+      return null
+    }
   }
 }
 

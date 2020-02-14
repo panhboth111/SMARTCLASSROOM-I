@@ -56,11 +56,6 @@
                 <v-list-item-title v-text="'Stream Management'"></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item router to="/user-management" v-if="user.role == 'Admin'">
-              <v-list-item-content>
-                <v-list-item-title v-text="'User Management'"></v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
           </v-list-item-group>
         </v-list>
       </template>
