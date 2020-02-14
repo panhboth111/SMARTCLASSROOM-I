@@ -131,6 +131,9 @@ export default {
     },  
     rebootDevice() {
       console.log("Rebooting");
+    },
+    editDeviceName(){
+      this.socket.emit("changeName",{deviceId,deviceName})
     }
   },
   mounted() {

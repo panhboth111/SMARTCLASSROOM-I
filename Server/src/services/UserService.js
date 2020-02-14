@@ -146,5 +146,20 @@ class UserService {
             else resolve({ "message": "You are not authorized to performed the following task", "errCode": "CR-001" }) 
         })
     }
+    async changeProfilePic({email},{newProfilePic}){
+        return new Promise(async(resolve,reject)=>{
+
+        })
+    }
+    async changeCoverPic({email},{newCoverPic}){
+        return new Promise(async(resolve,reject)=>{
+
+        })
+    }
+    async getPics({email}){
+        return new Promise(async(resolve,reject)=>{
+            
+        })
+    }
 }
 module.exports = UserService
