@@ -177,10 +177,17 @@ class StreamService {
             }
         })
     }
-    async getCurrentStreams(limit){
+    async getCurrentStreams(limit,status){
         return new Promise(async (resolve,reject)=>{
             try {
-                const currentlyStreamings = await Streaming.find({ isActive: true }).limit(limit).sort({ date: -1 });
+                let currentlyStreamings
+                console.log(status)
+                if (status == null){
+                    currentlyStreamings = await Streaming.find().limit(limit).sort({ date: -1 });
+                }else{
+                    currentlyStreamings = await Streaming.find({ isActive: status }).limit(limit).sort({ date: -1 });
+                }
+                console.log(currentlyStreamings)
                 resolve(currentlyStreamings)
             } catch (err) {
                 resolve(err)

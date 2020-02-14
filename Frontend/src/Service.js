@@ -23,11 +23,13 @@ class Service {
   }
 
   // Start Stream
-  static getCurrentlyStreaming(limit) {
+  static getCurrentlyStreaming(limit,status) {
     const token = cookie.getCookie("auth-token");
     return axios.post(
-      `${url}users/getCurrentlyStream`,
-      { limit },
+      `${url}streams/getCurrentlyStream`,
+      { limit,
+        status
+      },
       {
         params: {},
         headers: { "auth-token": token }
@@ -42,7 +44,7 @@ class Service {
     const route = (role === 'Device') ? 'deviceStartStream' : 'startStream'
     console.log(streamTitle + description + isPrivate + password);
     return axios.post(
-      `${url}users/${route}`,
+      `${url}streams/${route}`,
       {
         streamTitle,
         description,
@@ -59,7 +61,7 @@ class Service {
   static async joinStream(streamCode, pwd) {
     const token = cookie.getCookie("auth-token");
     const result = await axios.post(
-      `${url}users/joinStream`,
+      `${url}streams/joinStream`,
       {
         streamCode,
         pwd
@@ -77,7 +79,7 @@ class Service {
   // Edit Stream
   static async editStream(streamCode,streamTitle,description){
     const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
-    const result = await axios.post(`${url}users/editstream`, {
+    const result = await axios.post(`${url}streams/editstream`, {
       streamCode,
       streamTitle,
       description
@@ -92,7 +94,7 @@ class Service {
   // Stop stream
   static async stopStream() {
     const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
-    const result = await axios.get(`${url}users/stopStream`, {
+    const result = await axios.get(`${url}streams/stopStream`, {
       params: {},
       headers: { "auth-token": token }
     });
@@ -106,7 +108,7 @@ class Service {
   static getStreamDetail(streamCode) {
     const token = cookie.getCookie("auth-token");
     return axios.post(
-      `${url}users/getStreamDetail`,
+      `${url}streams/getStreamDetail`,
       { streamCode },
       { params: {}, headers: { "auth-token": token } }
     );
