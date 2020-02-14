@@ -20,8 +20,8 @@
                             <v-img src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"></v-img>
                         </v-list-item-avatar>
                         <v-list-item-content>
-                            <v-list-item-title>Chunvira Ly</v-list-item-title>
-                            <v-list-item-subtitle class="caption text-uppercase">Admin</v-list-item-subtitle>
+                            <v-list-item-title>{{ user.name }}</v-list-item-title>
+                            <v-list-item-subtitle class="caption text-uppercase">{{ user.role }}</v-list-item-subtitle>
                         </v-list-item-content>
                     </v-list-item>
                     <v-card-actions>
@@ -52,9 +52,9 @@
             <v-card>
                 <v-card-title>Edit your profile</v-card-title>
                 <v-card-text>
-                    <v-text-field label="Username"></v-text-field>
-                    <v-text-field label="Password"></v-text-field>
-                    <v-text-field label="Email"></v-text-field>
+                    <v-text-field label="Username" v-model="user.name"></v-text-field>
+                    <v-text-field label="Password" v-model="user.password"></v-text-field>
+                    <v-text-field label="Email" v-model="user.email"></v-text-field>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -67,6 +67,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
+
 export default {
     data: () => ({
         msg: "",
@@ -104,7 +106,10 @@ export default {
                 author: "Hun Vikran"
             }
         ]
-    })
+    }),
+    computed: {
+        ...mapState(["user"])
+    }
 }
 </script>
 
