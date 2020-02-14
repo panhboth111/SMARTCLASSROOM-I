@@ -218,7 +218,7 @@ export default {
       const selectedClasses = this.devices.filter(x => x["value"] == true)
       selectedClasses.forEach(x => deviceIds.push(x.deviceId));
       if(selectedClasses.length){
-        this.socket.emit('startCasting',{deviceIds,streamTitle:this.streamTitle,usedBy:this.user.email})
+        this.socket.emit('startCasting',{deviceIds,streamTitle:stream.data.streamCode,usedBy:this.user.email})
       }
       location.reload()
       window.location.replace(`/stream/${this.userCurrentStream}`);

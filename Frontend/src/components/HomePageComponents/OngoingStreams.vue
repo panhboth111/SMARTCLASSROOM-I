@@ -14,7 +14,7 @@
         <v-card
           dark
           :to="`/stream/${stream.id}`"
-          :id="`${stream.title}`"
+          :id="`${stream.id}`"
           :ref="`${stream.title}`"
           @click="myClickEvent"
         >
