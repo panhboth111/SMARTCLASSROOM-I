@@ -14,6 +14,11 @@
           <td>{{ props.item.description }}</td>
           <td>{{ props.item.streamFrom }}</td>
           <td :class="props.item.isActive ? 'red--text' : 'blue--text'">{{ (props.item.isActive)?"LIVE":"ENDED" }}</td>
+          <td>       
+            <v-btn outlined v-if="props.item.isActive" class="red white--text" id="stopStreamBtn" @click="stopStream()">
+              <v-icon left>mdi-record</v-icon>Stop Stream
+            </v-btn> 
+          </td>
         </tr>
       </template>
     </v-data-table>
@@ -50,6 +55,7 @@ export default {
             {text: "Description", value: "description"},
             {text: "From", value: "from"},
             {text: "Status", value: "status"},
+            {text: "Stop Stream", value: "Stop Stream"}
         ],
         streams: [
         ]
