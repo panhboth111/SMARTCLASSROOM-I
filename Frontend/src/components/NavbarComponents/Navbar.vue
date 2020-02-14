@@ -41,6 +41,11 @@
                 <v-list-item-title v-text="'Home'"></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item router to="/profile">
+              <v-list-item-content>
+                <v-list-item-title v-text="'Profile'"></v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item router to="/devices" v-if="user.role !== 'Student'">
               <v-list-item-content>
                 <v-list-item-title v-text="'Device Manager'"></v-list-item-title>

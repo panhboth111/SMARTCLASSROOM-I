@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home";
+import Profile from "../views/Profile"
 import About from "../views/About";
 import Login from "../views/Login";
 import StreamRoom from "../views/StreamRoom";
@@ -22,6 +23,11 @@ const routes = [
     path: "/home",
     name: "home",
     component: Home
+  },
+  {
+    path: "/profile",
+    name: "profile",
+    component: Profile
   },
   {
     path: "/about",

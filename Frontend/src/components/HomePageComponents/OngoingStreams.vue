@@ -6,8 +6,7 @@
         streams
       </h1>
       <v-spacer></v-spacer>
-      <!-- Not used as of right now -->
-      <!-- <v-btn text small>Show more</v-btn> -->
+      <v-btn text small>Refresh</v-btn>
     </v-row>
     <v-row>
       <v-col v-for="stream in streams" :key="stream.id" :lg="4" :md="6" :xs="12">
