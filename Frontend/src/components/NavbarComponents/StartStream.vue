@@ -141,7 +141,7 @@
             color="black darken-1"
             class="font-weight-black"
             text
-            @click="deviceStartStream()"
+            @click="is_from_webcam?startStream():deviceStartStream()"
           >Continue</v-btn>
           <v-overlay :value="loading" v-if="devices">
             <v-progress-circular indeterminate size="100"></v-progress-circular>
@@ -214,6 +214,12 @@ export default {
       this.user.isStreaming = stream.data.isStreaming;
       this.start_stream = false;
       this.userCurrentStream = stream.data.streamCode;
+      const deviceIds = [];
+      const selectedClasses = this.devices.filter(x => x["value"] == true)
+      selectedClasses.forEach(x => deviceIds.push(x.deviceId));
+      if(selectedClasses.length){
+        this.socket.emit('startCasting',{deviceIds,streamTitle:this.streamTitle,usedBy:this.user.email})
+      }
       location.reload()
       window.location.replace(`/stream/${this.userCurrentStream}`);
     },

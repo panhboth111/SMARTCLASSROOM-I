@@ -64,7 +64,7 @@ class StreamService {
                 const savedStream = await newStream.save()
                 await User.updateOne({ email: streamBy }, { currentStream: streamCode, isStreaming: true })
                 //await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
-                //axios.post('http://10.10.17.15:3001/redirect', { streamBy, streamCode }).catch((er) => console.log(er))
+                axios.post('http://10.10.17.15:3001/redirect', { streamBy, streamCode }).catch((er) => console.log(er))
                 resolve({ streamCode: savedStream.streamCode, streamTitle: savedStream.streamTitle, Description: savedStream.Description })
         
         
