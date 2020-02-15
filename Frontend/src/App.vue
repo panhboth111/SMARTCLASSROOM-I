@@ -10,8 +10,8 @@
 <script>
 import Navbar from "./components/NavbarComponents/Navbar";
 // import backend from "./Service";
-import auth from "./auth";
-import synclog from "./synclog";
+// import auth from "./auth";
+// import synclog from "./synclog";
 
 export default {
   name: "App",
@@ -24,8 +24,12 @@ export default {
       this.user.currentStream = user.data.currentStream;
       this.user.email = user.data.email;
     },
-    async redirectUnauthorized(){
-      if(window.location.pathname === '/devices' && (this.user.role !== 'Admin' || this.user.role !== 'Lecturer')) window.location.replace('/')
+    async redirectUnauthorized() {
+      if (
+        window.location.pathname === "/devices" &&
+        (this.user.role !== "Admin" || this.user.role !== "Lecturer")
+      )
+        window.location.replace("/");
     }
   },
   components: {
@@ -43,8 +47,8 @@ export default {
   created() {
     this.redirectUnauthorized();
     this.getUser();
-    auth();
-    synclog;
+    // auth();
+    // synclog;
   }
 };
 </script>
