@@ -64,7 +64,7 @@ class StreamService {
                 const savedStream = await newStream.save()
                 await User.updateOne({ email: streamBy }, { currentStream: streamCode, isStreaming: true })
                 //await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
-                //axios.post('http://10.10.17.15:3001/redirect', { streamBy, streamCode }).catch((er) => console.log(er))
+                axios.post('http://10.10.17.15:3001/redirect', { streamBy, streamCode }).catch((er) => console.log(er))
                 resolve({ streamCode: savedStream.streamCode, streamTitle: savedStream.streamTitle, Description: savedStream.Description })
         
         
@@ -177,10 +177,17 @@ class StreamService {
             }
         })
     }
-    async getCurrentStreams(limit){
+    async getCurrentStreams(limit,status){
         return new Promise(async (resolve,reject)=>{
             try {
-                const currentlyStreamings = await Streaming.find({ isActive: true }).limit(limit).sort({ date: -1 });
+                let currentlyStreamings
+                console.log(status)
+                if (status == null){
+                    currentlyStreamings = await Streaming.find().limit(limit).sort({ date: -1 });
+                }else{
+                    currentlyStreamings = await Streaming.find({ isActive: status }).limit(limit).sort({ date: -1 });
+                }
+                console.log(currentlyStreamings)
                 resolve(currentlyStreamings)
             } catch (err) {
                 resolve(err)

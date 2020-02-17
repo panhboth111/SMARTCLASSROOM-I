@@ -5,6 +5,7 @@ const socket = require('../loaders/socket')
 module.exports = (event) => {
     usb.startMonitoring()
     usb.on(event,async(device)=> {
+        console.log("changed")
         const cameraPlugged = (event === 'add')?true:false
         if(device.deviceName === 'USB Optical Mouse' || device.deviceName === 'USB_Optical_Mouse') { 
             await Device.updateOne({},{cameraPlugged})

@@ -16,6 +16,18 @@ const schema = mongoose.Schema({
     isStreaming : {
         type : Boolean,
         default : false
+    },
+    profilePic:{
+        type:String,
+        default:""
+    },
+    coverPic:{
+        type:String,
+        default:""
+    },
+    history:{
+        type:Array,
+        default:[]
     }
 })
 

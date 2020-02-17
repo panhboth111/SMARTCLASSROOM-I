@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     async getcurrentlyStreaming(limit) {
-      const streams = await backend.getCurrentlyStreaming(limit);
+      const streams = await backend.getCurrentlyStreaming(limit,true);
       console.log(streams.data);
       if (streams.data) {
         streams.data.forEach(stream => {
@@ -76,7 +76,7 @@ export default {
     }
   },
   created() {
-    this.getcurrentlyStreaming(6);
+    this.getcurrentlyStreaming(6,true);
   }
 };
 </script>

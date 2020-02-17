@@ -17,6 +17,12 @@
           <td>{{ props.item.ownerName }}</td>
           <td>{{ props.item.description }}</td>
           <td>{{ props.item.streamFrom }}</td>
+          <td :class="props.item.isActive ? 'red--text' : 'blue--text'">{{ (props.item.isActive)?"LIVE":"ENDED" }}</td>
+          <td>       
+            <v-btn outlined v-if="props.item.isActive" class="red white--text" id="stopStreamBtn" @click="stopStream()">
+              <v-icon left>mdi-record</v-icon>Stop Stream
+            </v-btn> 
+          </td>
         </tr>
       </template>
     </v-data-table>
@@ -29,8 +35,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text @click="onStreamSave()">Cancel</v-btn>
-          <v-btn text @click="onStreamSave()">Delete</v-btn>
+          <v-btn text @click="onCancel()">Cancel</v-btn>
           <v-btn text class="font-weight-bold" @click="onStreamSave()">Save</v-btn>
         </v-card-actions>
       </v-card>      
@@ -53,6 +58,8 @@ export default {
             {text: "Author", value: "streamAuthor"},
             {text: "Description", value: "description"},
             {text: "From", value: "from"},
+            {text: "Status", value: "status"},
+            {text: "Stop Stream", value: "Stop Stream"}
         ],
         streams: [
         ]
@@ -67,7 +74,9 @@ export default {
 
             this.editStreamModal = true   
         },
-
+        onCancel(){
+          this.editStreamModal = false
+        },
         // On Stream Save
         async onStreamSave(){
             const result = await backend.editStream(this.streamCode, this.streamTitle, this.description)
@@ -80,9 +89,10 @@ export default {
             }
         },
         async getAllStream(){
-          const streams = await backend.getCurrentlyStreaming(6)
-          console.log(streams.data)
+          const streams = await backend.getCurrentlyStreaming(6,null)
+          
           this.streams = streams.data
+          console.log(this.streams)
         }
     },
     created(){
