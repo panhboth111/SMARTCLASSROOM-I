@@ -1,7 +1,12 @@
 <template>
   <v-container class="px-12">
     <v-form ref="form" @submit.prevent="login()">
-      <v-text-field id="usernameInput" label="E-mail" v-model="username" color="black"></v-text-field>
+      <v-text-field
+        id="usernameInput"
+        label="E-mail"
+        v-model="username"
+        color="black"
+      ></v-text-field>
       <v-text-field
         id="passwordInput"
         label="Password"
@@ -20,7 +25,9 @@
         class="mb-5 mt-6"
       ></v-checkbox>
 
-      <v-btn id="loginBtn" color="black" dark block height="50" @click="login()">Login</v-btn>
+      <v-btn id="loginBtn" color="black" dark block height="50" @click="login()"
+        >Login</v-btn
+      >
     </v-form>
   </v-container>
 </template>
@@ -39,12 +46,10 @@ export default {
   },
   methods: {
     async login() {
-      const message = await backend.login(this.username, this.password);
-      alert(message.message);
+      await backend.login(this.username, this.password);
     }
   }
 };
 </script>
 
-<style>
-</style>
+<style></style>

@@ -59,28 +59,43 @@
               v-model="is_private"
               label="Private stream"
             ></v-switch>
-            <v-text-field label="Password" color="black" required v-if="is_private"></v-text-field>
+            <v-text-field
+              label="Password"
+              color="black"
+              required
+              v-if="is_private"
+            ></v-text-field>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="black darken-1" text @click="create_stream = false">Cancel</v-btn>
+          <v-btn color="black darken-1" text @click="create_stream = false"
+            >Cancel</v-btn
+          >
           <v-btn
             text
             class="font-weight-black"
             v-if="is_from_webcam && user.role !== 'Student'"
             @click="select_classes = true"
             :disabled="streamTitle === ''"
-          >Continue</v-btn>
+            >Continue</v-btn
+          >
           <v-btn
             v-else
             text
             v-on="on"
             class="font-weight-black"
-            @click="user.role === 'Student' || user.role === 'Device' || is_from_webcam ? startStream() : select_class = true"
+            @click="
+              user.role === 'Student' ||
+              user.role === 'Device' ||
+              is_from_webcam
+                ? startStream()
+                : (select_class = true)
+            "
             id="startBtn"
             :disabled="streamTitle === ''"
-          >Continue</v-btn>
+            >Continue</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -102,14 +117,17 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="black darken-1" text @click="select_class = false">Cancel</v-btn>
+          <v-btn color="black darken-1" text @click="select_class = false"
+            >Cancel</v-btn
+          >
           <v-btn
             text
             @click="select_classes = true"
             class="font-weight-black"
             id="startStreamBtn"
             :disabled="selectedDevice === ''"
-          >Continue</v-btn>
+            >Continue</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -135,14 +153,17 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="black darken-1" text @click="select_classes = false">Cancel</v-btn>
+          <v-btn color="black darken-1" text @click="select_classes = false"
+            >Cancel</v-btn
+          >
           <v-btn
             id="startBtn"
             color="black darken-1"
             class="font-weight-black"
             text
-            @click="is_from_webcam?startStream():deviceStartStream()"
-          >Continue</v-btn>
+            @click="is_from_webcam ? startStream() : deviceStartStream()"
+            >Continue</v-btn
+          >
           <v-overlay :value="loading" v-if="devices">
             <v-progress-circular indeterminate size="100"></v-progress-circular>
           </v-overlay>
@@ -155,7 +176,7 @@
 import backend from "../../Service";
 //import axios from "axios";
 import io from "socket.io-client";
-import {URL} from "../../../config"
+import { URL } from "../../../config";
 
 export default {
   data: () => ({
@@ -199,8 +220,23 @@ export default {
     user: Object
   },
   methods: {
+    stream() {
+      const selectedClasses = this.devices.filter(x => x["value"] == true);
+      if (this.is_from_webcam) {
+        if (selectedClasses.length === 0) {
+          this.startStream();
+        } else {
+          this.loading = true;
+          //  Fix startStream method to handle casting btw
+          this.startStream();
+        }
+      } else {
+        this.loading = true;
+        this.deviceStartStream();
+      }
+    },
     async startStream() {
-      console.log("startstream")
+      console.log("startstream");
       const stream = await backend.startStream(
         this.streamTitle,
         this.description,
@@ -210,37 +246,46 @@ export default {
         this.user.role,
         true
       );
-      console.log("backk")
+      console.log("backk");
       this.user.isStreaming = stream.data.isStreaming;
       this.start_stream = false;
       this.userCurrentStream = stream.data.streamCode;
       const deviceIds = [];
-      const selectedClasses = this.devices.filter(x => x["value"] == true)
+      const selectedClasses = this.devices.filter(x => x["value"] == true);
       selectedClasses.forEach(x => deviceIds.push(x.deviceId));
-      if(selectedClasses.length){
-        this.socket.emit('startCasting',{deviceIds,streamTitle:stream.data.streamCode,usedBy:this.user.email})
+      if (selectedClasses.length) {
+        this.socket.emit("startCasting", {
+          deviceIds,
+          streamTitle: stream.data.streamCode,
+          usedBy: this.user.email
+        });
       }
-      location.reload()
+      location.reload();
       window.location.replace(`/stream/${this.userCurrentStream}`);
     },
     getAvailableDevices() {
       this.socket.on("info", device_info => {
-        this.devices = device_info.filter(device => device.online && !device.streaming && device.cameraPlugged)
-        console.log(this.devices)
+        this.devices = device_info.filter(
+          device => device.online && !device.streaming && device.cameraPlugged
+        );
+        console.log(this.devices);
       });
     },
     async deviceStartStream() {
-      console.log("device start")
-      this.loading = true;
+      console.log("device start");
       const deviceIds = [];
       const selectedClasses = this.devices.filter(x => x["value"] == true);
       selectedClasses.forEach(x => deviceIds.push(x.deviceId));
-      this.socket.emit('startStreaming',{deviceIds,
-        deviceId:this.devices.filter(x => x["deviceName"] === this.selectedDevice)[0]["deviceId"] || "None",
-        userEmail:this.user.email,
-        streamTitle:this.streamTitle,
-        description:this.description
-      })
+      this.socket.emit("startStreaming", {
+        deviceIds,
+        deviceId:
+          this.devices.filter(x => x["deviceName"] === this.selectedDevice)[0][
+            "deviceId"
+          ] || "None",
+        userEmail: this.user.email,
+        streamTitle: this.streamTitle,
+        description: this.description
+      });
       this.socket.on("redirect", async ({ streamBy, streamCode }) => {
         console.log(streamBy);
         console.log(this.user.email);

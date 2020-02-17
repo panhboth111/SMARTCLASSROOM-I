@@ -1,6 +1,10 @@
 <template>
   <v-container>
-      <h1 class="display-1 mt-8 mb-10">Stream Management</h1>
+    <v-row class="ml-1 mt-8 mb-10">
+      <h1 class="display-1">Stream Management</h1>
+      <v-spacer></v-spacer>
+      <v-btn text small>Refresh</v-btn>
+    </v-row>
       <v-data-table
         :items="streams"
         :headers="streamHeaders"

@@ -12,7 +12,7 @@
 import backend from "../Service";
 import io from "socket.io-client";
 import OngoingStreams from "../components/HomePageComponents/OngoingStreams";
-import {URL} from '../../config'
+import { URL } from "../../config";
 // I disabled these because it is not implemented as of right now
 
 // import PreviousVideos from "../components/HomePageComponents/PreviousVideos";
@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     async getcurrentlyStreaming(limit) {
-      const streams = await backend.getCurrentlyStreaming(limit,true);
+      const streams = await backend.getCurrentlyStreaming(limit, true);
       console.log(streams.data);
       if (streams.data) {
         streams.data.forEach(stream => {
@@ -76,10 +76,9 @@ export default {
     }
   },
   created() {
-    this.getcurrentlyStreaming(6,true);
+    this.getcurrentlyStreaming(6, true);
   }
 };
 </script>
 
-<style>
-</style>
+<style></style>
