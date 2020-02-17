@@ -43,7 +43,19 @@ export default {
   // },
   computed: {
     isLoaded() {
-      return this.$store.getters.user.name !== undefined;
+      let loaded;
+      if (
+        window.location.pathname == "/" ||
+        window.location.pathname == "/device-login"
+      )
+        loaded = true;
+      else if (
+        window.location.pathname != "/" &&
+        this.$store.getters.user.name == undefined
+      )
+        false;
+      else loaded = true;
+      return loaded;
     }
   },
   async created() {
