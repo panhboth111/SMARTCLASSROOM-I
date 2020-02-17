@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <Navbar v-if="$route.name !== 'login' && $route.name !== 'device-login'" :user="user" />
+    <Navbar v-if="$route.name !== 'login' && $route.name !== 'device-login'" />
     <v-content>
       <router-view :user="user"></router-view>
     </v-content>
@@ -9,37 +9,34 @@
 
 <script>
 import Navbar from "./components/NavbarComponents/Navbar";
-import backend from "./Service";
+// import backend from "./Service";
 import auth from "./auth";
 import synclog from "./synclog";
+import { mapState } from "vuex";
 
 export default {
   name: "App",
   methods: {
     async getUser() {
       const user = await backend.getUserInfo();
-      this.user.name = user.data.name;
-      this.user.role = user.data.role;
-      this.user.isStreaming = user.data.isStreaming;
-      this.user.currentStream = user.data.currentStream;
-      this.user.email = user.data.email;
+      this.$state.commit("getUser", user.data);
     },
-    async redirectUnauthorized(){
-      if(window.location.pathname === '/devices' && (this.user.role !== 'Admin' || this.user.role !== 'Lecturer')) window.location.replace('/')
+    async redirectUnauthorized() {
+      if (
+        window.location.pathname === "/devices" &&
+        (this.user.role !== "Admin" || this.user.role !== "Lecturer")
+      )
+        window.location.replace("/");
     }
   },
   components: {
     Navbar
   },
 
-  data: () => ({
-    user: {
-      name: "",
-      role: "",
-      isStreaming: false
-    }
-  }),
-
+  data: () => ({}),
+  computed: {
+    ...mapState(["user"])
+  },
   created() {
     this.redirectUnauthorized();
     this.getUser();

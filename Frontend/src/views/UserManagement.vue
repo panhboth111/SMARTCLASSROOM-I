@@ -1,6 +1,10 @@
 <template>
   <v-container>
-    <h1 class="display-1 mt-8 mb-10">User Management</h1>
+    <v-row class="ml-1 mt-8 mb-10">
+      <h1 class="display-1">User Management</h1>
+      <v-spacer></v-spacer>
+      <v-btn text small>Refresh</v-btn>
+    </v-row>
     <v-data-table
       :items="users"
       :headers="userHeaders"

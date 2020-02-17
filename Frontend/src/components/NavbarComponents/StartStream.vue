@@ -199,6 +199,21 @@ export default {
     user: Object
   },
   methods: {
+    stream() {
+      const selectedClasses = this.devices.filter(x => x["value"] == true);
+      if (this.is_from_webcam) {
+        if (selectedClasses.length === 0) {
+          this.startStream()
+        } else {
+          this.loading = true
+          //  Fix startStream method to handle casting btw
+          this.startStream()
+        }
+      } else {
+        this.loading = true
+        this.deviceStartStream()
+      }
+    },
     async startStream() {
       console.log("startstream")
       const stream = await backend.startStream(
@@ -231,7 +246,6 @@ export default {
     },
     async deviceStartStream() {
       console.log("device start")
-      this.loading = true;
       const deviceIds = [];
       const selectedClasses = this.devices.filter(x => x["value"] == true);
       selectedClasses.forEach(x => deviceIds.push(x.deviceId));

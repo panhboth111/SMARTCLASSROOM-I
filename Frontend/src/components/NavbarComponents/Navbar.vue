@@ -41,6 +41,11 @@
                 <v-list-item-title v-text="'Home'"></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item router to="/profile">
+              <v-list-item-content>
+                <v-list-item-title v-text="'Profile'"></v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item router to="/devices" v-if="user.role !== 'Student'">
               <v-list-item-content>
                 <v-list-item-title v-text="'Device Manager'"></v-list-item-title>
@@ -69,6 +74,7 @@ import auth from "../../auth";
 import backend from "../../Service";
 import io from "socket.io-client";
 import {URL} from '../../../config'
+import { mapState } from "vuex"
 
 export default {
   data: () => {
@@ -85,7 +91,7 @@ export default {
     };
   },
   props: {
-    user: Object
+
   },
   methods: {
     signout() {
@@ -97,6 +103,9 @@ export default {
       backend.stopStream();
       this.socket.emit('stop',this.user.email)
     }
+  },
+  computed: {
+    ...mapState(['user'])
   },
   components: {
     StartStream
