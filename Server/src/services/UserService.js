@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Credential = require("../models/credential");
+const History = require("../models/history");
 const bcrypt = require("bcrypt");
 const validate = require("validate.js");
 const jwt = require("jsonwebtoken");
@@ -203,14 +204,36 @@ class UserService {
         });
     });
   }
-  async changeProfilePic({ email }, { newProfilePic }) {
-    return new Promise(async (resolve, reject) => {});
+  async changeProfilePic({ newProfile }, { email }) {
+    return new Promise(async (resolve, reject) => {
+      await User.updateOne({ email }, { profilePic: newProfile })
+        .then(() =>
+          resolve({
+            message: "Profile picture changed successfully",
+            success: true
+          })
+        )
+        .catch(err => resolve({ message: err.message, success: false }));
+    });
   }
-  async changeCoverPic({ email }, { newCoverPic }) {
-    return new Promise(async (resolve, reject) => {});
+  async changeCoverPic({ newCover }, { email }) {
+    return new Promise(async (resolve, reject) => {
+      await User.updateOne({ email }, { coverPic: newCover })
+        .then(() =>
+          resolve({
+            message: "Cover picture changed successfully",
+            success: true
+          })
+        )
+        .catch(err => resolve({ message: err.message, success: false }));
+    });
   }
-  async getPics({ email }) {
-    return new Promise(async (resolve, reject) => {});
+  async getUserHistory({ email }) {
+    return new Promise(async (resolve, reject) => {
+      await History.find({ email })
+        .then(history => resolve({ message: history, success: true }))
+        .catch(err => resolve({ message: err, success: false }));
+    });
   }
 }
 module.exports = UserService;

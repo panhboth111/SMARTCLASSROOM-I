@@ -6,7 +6,13 @@
       <v-col cols="4">
         <p class="headline">Account</p>
         <v-card class="mx-auto my-4" justify-center height="350px">
-          <v-btn absolute small right class="mt-2 coverPicBtn" @click="uploadCoverPic">
+          <v-btn
+            absolute
+            small
+            right
+            class="mt-2 coverPicBtn"
+            @click="uploadCoverPic"
+          >
             Upload Photo
             <v-icon>mdi-upload</v-icon>
           </v-btn>
@@ -18,11 +24,11 @@
             style="display:none"
           />
           <v-img
-            :src="coverPicURL"
+            :src="user.coverPic"
             alt="NO IMG"
             class="align-end align-right"
             height="200px"
-            @click="showCoverPic=true"
+            @click="showCoverPic = true"
           ></v-img>
 
           <v-divider></v-divider>
@@ -30,7 +36,7 @@
           <v-divider></v-divider>
 
           <v-tooltip bottom>
-            <template v-slot:activator="{on}">
+            <template v-slot:activator="{ on }">
               <v-btn
                 fab
                 small
@@ -38,7 +44,7 @@
                 right
                 v-on="on"
                 class="editProfileBtn"
-                @click="editProfileDialog=true"
+                @click="editProfileDialog = true"
               >
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
@@ -49,10 +55,10 @@
           <div class="profileInfo">
             <v-avatar size="130" color="black" class="profilePic mb-2">
               <v-avatar size="120" class @click="showProfilePic = true">
-                <img :src="profilePicURL" />
+                <img :src="user.profilePic" />
               </v-avatar>
               <v-tooltip right>
-                <template v-slot:activator="{on}">
+                <template v-slot:activator="{ on }">
                   <v-btn
                     absolute
                     right
@@ -76,21 +82,26 @@
               />
             </v-avatar>
 
-            <p class="headline">{{name}}</p>
-            <p class="caption">{{role}}</p>
+            <p class="headline">{{ user.name }}</p>
+            <p class="caption">{{ user.role }}</p>
           </div>
         </v-card>
       </v-col>
 
       <v-col offset="1" cols="7">
         <p class="headline">Streams</p>
-        <p class="title font-regular my-4">Your previous streams</p>
+        <p class="title font-regular my-4">Your History</p>
         <v-row>
-          <v-col v-for="(stream, i) in streams" :key="i" :lg="6" :md="12">
+          <v-col v-for="(stream, i) in user.history" :key="i" :lg="6" :md="12">
             <v-card dark @click="myClickEvent">
-              <v-img :src="stream.img_url" class="white--text align-end" height="240px">
-                <v-card-title v-text="stream.title"></v-card-title>
-                <v-card-subtitle v-text="stream.author"></v-card-subtitle>
+              <v-img
+                :src="stream.img_url"
+                class="white--text align-end"
+                height="240px"
+                alt="pic"
+              >
+                <v-card-title v-text="stream.streamTitle"></v-card-title>
+                <v-card-subtitle v-text="stream.action"></v-card-subtitle>
               </v-img>
             </v-card>
           </v-col>
@@ -121,11 +132,15 @@
 
         <v-container>
           <v-row justify="space-around" class="my-5">
-            <v-btn @click="changeUsername=true">Change Username</v-btn>
+            <v-btn @click="changeUsername = true">Change Username</v-btn>
           </v-row>
-          <v-text-field v-if="changeUsername" v-model="newName" label="Username"></v-text-field>
+          <v-text-field
+            v-if="changeUsername"
+            v-model="newName"
+            label="Username"
+          ></v-text-field>
           <v-row justify="space-around" class="my-5">
-            <v-btn @click="changePassword=true">Change Password</v-btn>
+            <v-btn @click="changePassword = true">Change Password</v-btn>
           </v-row>
           <v-text-field
             type="password"
@@ -145,7 +160,7 @@
             v-model="confirmPassword"
             label="Confirm Password"
           ></v-text-field>
-          <p class="red--text">{{errorMsg}}</p>
+          <p class="red--text">{{ errorMsg }}</p>
         </v-container>
 
         <v-divider></v-divider>
@@ -153,7 +168,9 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="cancelEditProfile">Cancel</v-btn>
-          <v-btn text @click="editProfile" class="font-weight-black">Save</v-btn>
+          <v-btn text @click="editProfile" class="font-weight-black"
+            >Save</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -161,12 +178,13 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
+//import { mapState } from "vuex";
+import backend from "../Service";
 export default {
   data() {
     return {
-      user: mapState,
+      //user: mapState,
+      user: {},
       name: "Name",
       role: "Role",
       coverPicURL: "https://cdn.vuetifyjs.com/images/cards/sunshine.jpg",
@@ -216,32 +234,41 @@ export default {
     };
   },
   methods: {
+    getUser() {
+      this.user = this.$store.getters.user;
+    },
     uploadCoverPic() {
       this.$refs.coverPicInput.click();
     },
     uploadProfilePic() {
       this.$refs.profilePicInput.click();
     },
-    onCoverPicPicked(event) {
+    async onCoverPicPicked(event) {
       const files = event.target.files;
       const selectedFile = files[0];
 
       const fileReader = new FileReader();
       fileReader.readAsDataURL(selectedFile);
 
-      fileReader.addEventListener("load", () => {
+      fileReader.addEventListener("load", async () => {
         this.coverPicURL = fileReader.result;
+        const response = await backend.changeCover(this.coverPicURL);
+        alert(response.message);
+        location.reload();
       });
     },
-    onProfilePicPicked(event) {
+    async onProfilePicPicked(event) {
       const files = event.target.files;
       const selectedFile = files[0];
 
       const fileReader = new FileReader();
       fileReader.readAsDataURL(selectedFile);
 
-      fileReader.addEventListener("load", () => {
+      fileReader.addEventListener("load", async () => {
         this.profilePicURL = fileReader.result;
+        const response = await backend.changeProfile(this.profilePicURL);
+        alert(response.message);
+        location.reload();
       });
     },
     editProfile() {
@@ -280,6 +307,10 @@ export default {
       this.confirmPassword = "";
       this.errorMsg = "";
     }
+  },
+  created() {
+    this.getUser();
+    console.log(this.$store.getters.user.history);
   }
 };
 </script>

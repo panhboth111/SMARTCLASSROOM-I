@@ -1,5 +1,6 @@
 export default {
-  getUserInfo: (state, user) => {
-    state.user = user;
+  getUserInfo: (state, { user, history }) => {
+    state.user = { ...user, history };
+    console.log(history);
   }
 };

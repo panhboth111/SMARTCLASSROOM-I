@@ -36,6 +36,7 @@ class StreamService {
           ownerName
         });
         const savedStream = await newStream.save();
+        console.log(owner);
         await new History({
           action: "Started a stream",
           streamCode,

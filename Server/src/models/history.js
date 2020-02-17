@@ -10,7 +10,7 @@ const schema = mongoose.Schema({
   streamTitle: {
     type: String
   },
-  emai: {
+  email: {
     type: String
   }
 });

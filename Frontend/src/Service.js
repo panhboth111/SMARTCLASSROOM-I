@@ -12,6 +12,32 @@ class Service {
       headers: { "auth-token": token }
     });
   }
+  static getUserHistory() {
+    const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
+    return axios.get(`${url}users/userHistory`, {
+      params: {},
+      headers: { "auth-token": token }
+    });
+  }
+
+  static async changeCover(newCover) {
+    const token = cookie.getCookie("auth-token");
+    const response = await axios.post(
+      `${url}users/changeCover`,
+      { newCover },
+      { params: {}, headers: { "auth-token": token } }
+    );
+    return response.data;
+  }
+  static async changeProfile(newProfile) {
+    const token = cookie.getCookie("auth-token");
+    const response = await axios.post(
+      `${url}users/changeProfile`,
+      { newProfile },
+      { params: {}, headers: { "auth-token": token } }
+    );
+    return response.data;
+  }
 
   // Get Users info
   static getAllUsers() {

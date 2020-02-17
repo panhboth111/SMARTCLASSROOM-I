@@ -25,5 +25,18 @@ router.post("/changeRole", verify, async (req, res) => {
   });
   return res.json(response);
 });
+router.post("/changeCover", verify, async (req, res) => {
+  const response = await userService.changeCoverPic(req.body, req.user);
+  return res.json(response);
+});
+router.post("/changeProfile", verify, async (req, res) => {
+  const response = await userService.changeProfilePic(req.body, req.user);
+  return res.json(response);
+});
+router.get("/userHistory", verify, async (req, res) => {
+  const response = await userService.getUserHistory(req.user);
+  console.log(response);
+  return res.json(response);
+});
 
 module.exports = router;
