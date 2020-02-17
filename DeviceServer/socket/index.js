@@ -29,6 +29,8 @@ module.exports = async() => {
     app.post('/redirect',(req,res)=>{
         console.log('redirecting...')
         console.log(req.body)
-        io.emit('redirect',req.body)
+        setTimeout(()=>{
+            io.emit('redirect',req.body)
+        },3000)
     })
 }

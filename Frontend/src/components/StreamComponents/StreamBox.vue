@@ -88,6 +88,7 @@ export default {
   // },
   data() {
     return {
+      api : null,
       hasLoaded: true,
       streamName: this.$route.params.streamName,
       streamTitle: "",
@@ -120,20 +121,19 @@ export default {
       }
     },
     async streamOn(streamCode,streamTitle){
+        // eslint-disable-next-line no-unused-vars
         const {domain, options, role, name} = await backend.joinStream(streamCode,"")
-        var api = null
+        this.api = null
         $( document ).ready(function() {
             options["parentNode"] = document.querySelector('#newStreamRoom');
-            api = new JitsiMeetExternalAPI(domain, options);
-            api.executeCommand('displayName', name);
-
-            // Lecturer Logic
-            if (role == "Lecturer"){
-              api.executeCommand('subject', streamTitle);
-              // Do lecturer stuff
-            }
+            this.api = new JitsiMeetExternalAPI(domain, options);
+            this.api.executeCommand('displayName', name);
+            this.api.executeCommand('subject', streamTitle);
         });
     }
+  },
+  mounted(){
+    
   }
 };
 

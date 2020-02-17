@@ -141,9 +141,9 @@
             color="black darken-1"
             class="font-weight-black"
             text
-            @click="deviceStartStream()"
+            @click="is_from_webcam?startStream():deviceStartStream()"
           >Continue</v-btn>
-          <v-overlay :value="loading">
+          <v-overlay :value="loading" v-if="devices">
             <v-progress-circular indeterminate size="100"></v-progress-circular>
           </v-overlay>
         </v-card-actions>
@@ -155,12 +155,13 @@
 import backend from "../../Service";
 //import axios from "axios";
 import io from "socket.io-client";
+import {URL} from "../../../config"
 
 export default {
   data: () => ({
     loading: false,
     devices: [],
-    socket: io("http://10.10.15.11:3001"),
+    socket: io(`http://${URL}:3001`),
     selectedDevice: "",
     tag_list: [],
     create_stream: false,
@@ -198,6 +199,21 @@ export default {
     user: Object
   },
   methods: {
+    stream() {
+      const selectedClasses = this.devices.filter(x => x["value"] == true);
+      if (this.is_from_webcam) {
+        if (selectedClasses.length === 0) {
+          this.startStream()
+        } else {
+          this.loading = true
+          //  Fix startStream method to handle casting btw
+          this.startStream()
+        }
+      } else {
+        this.loading = true
+        this.deviceStartStream()
+      }
+    },
     async startStream() {
       console.log("startstream")
       const stream = await backend.startStream(
@@ -211,18 +227,14 @@ export default {
       );
       console.log("backk")
       this.user.isStreaming = stream.data.isStreaming;
-      // axios.post("http://10.10.15.11:5000/devices/startStreaming", {
-      //   streamTitle: this.streamTitle,S
-      //   description: this.description,
-      //   isPrivate: this.is_private,
-      //   deviceId: this.selectedDevice
-      // });
-      // axios.post("http://10.10.15.11:5000/devices/startProjecting", {
-      //   deviceIds: [],
-      //   streamBoxId: "meet"
-      // });
       this.start_stream = false;
       this.userCurrentStream = stream.data.streamCode;
+      const deviceIds = [];
+      const selectedClasses = this.devices.filter(x => x["value"] == true)
+      selectedClasses.forEach(x => deviceIds.push(x.deviceId));
+      if(selectedClasses.length){
+        this.socket.emit('startCasting',{deviceIds,streamTitle:stream.data.streamCode,usedBy:this.user.email})
+      }
       location.reload()
       window.location.replace(`/stream/${this.userCurrentStream}`);
     },
@@ -234,21 +246,9 @@ export default {
     },
     async deviceStartStream() {
       console.log("device start")
-      this.loading = true;
       const deviceIds = [];
       const selectedClasses = this.devices.filter(x => x["value"] == true);
       selectedClasses.forEach(x => deviceIds.push(x.deviceId));
-      // axios.post("http://10.10.15.11:3001/devices/startStreaming", {
-      //   deviceIds: deviceIds,
-      //   deviceId:
-      //     this.devices.filter(x => x["deviceName"] === this.selectedDevice)[0][
-      //       "deviceId"
-      //     ] || "None",
-      //   owner: this.user.name,
-      //   streamTitle: this.streamTitle,
-      //   description: this.description,
-      //   userEmail: this.user.email
-      // });
       this.socket.emit('startStreaming',{deviceIds,
         deviceId:this.devices.filter(x => x["deviceName"] === this.selectedDevice)[0]["deviceId"] || "None",
         userEmail:this.user.email,

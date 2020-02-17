@@ -5,71 +5,83 @@ const User = require("../models/user")
 const uID = require("../utilities/UniqueCode")
 const verify = require("../utilities/VerifyToken")
 const Streaming = require('../models/streaming')
+const Credential = require('../models/credential')
 
 
 // Get all user info
-router.get("/allUser", verify , async (req, res) => {
+router.get("/allUsers", verify, async (req, res) => {
     const role = req.user.role
-    const email = req.user.email
+    const owner = req.user.email
     adminReg = /admin/i
-    if (adminReg.test(role)){
-        users = await User.find({email : {$ne : email} })
+    if (adminReg.test(role)) {
+        const users = await User.find({ email: { $ne: owner }, role: { $ne: "Admin" } }, { "email": 1, "name": 1, "role": 1 })
         return res.json(users);
-    }else{
-        return res.json({message : "You are not authorized!", errCode : "AU-001"})
+    } else {
+        return res.json({ message: "You are not authorized!", errCode: "AU-001" })
     }
 })
 
 // Get user Info
-router.get("/user", verify , async (req, res) => {
+router.get("/user", verify, async (req, res) => {
     const email = req.user.email
-    const user = await User.findOne({email})
-    const {name,isStreaming} = user
-    const _user = {
-        email,
-        name,
-        isStreaming,
-        role:req.user.role
-    }
-    return res.json(_user)
+    const user = await User.findOne({ email })
+    // const {name,isStreaming} = user
+    // const _user = {
+    //     email,
+    //     name,
+    //     isStreaming,
+    //     role:req.user.role
+    // }
+    return res.json(user)
 })
 
 // Changer user role
-router.get("/changeRole", verify, async(req, res) => {
+router.post("/changeRole", verify, async (req, res) => {
+    console.log("Recieve Route")
     email = req.user.email
     role = req.user.role
     targetUser = req.body.email
     targetRole = req.body.role
-
+    console.log(targetRole + targetUser)
     roleReg = /admin/i
 
-    if (roleReg.test(role)){
-        update = await Credential.updateOne({role : targetRole},{email : targetUser})
-        if (update.n > 0){
-            return res.json({"message" : "Success fully update user '" + targetUser + "' to '"+ targetRole +"'" })
-        }else{
-            return res.json({"messgage" : "An error occurred during role changing process"})
+    if (roleReg.test(role)) {
+        update = await User.updateOne({ email: targetUser }, { role: targetRole })
+        if (update.n > 0) {
+            return res.json({ "message": "Success fully update user '" + targetUser + "' to '" + targetRole + "'" })
+        } else {
+            return res.json({ "messgage": "An error occurred during role changing process", "errCode": "CR-002" })
         }
-    }else{
-        return res.json({"message" : "You are not authorized to performed the following task", "errCode":"CR-001"})
+    } else {
+        return res.json({ "message": "You are not authorized to performed the following task", "errCode": "CR-001" })
     }
 })
 
 // Start stream
 router.post("/startStream", verify, async (req, res) => {
+
     console.log("start")
     const owner = req.user.email
     const ownerName = req.user.name
-    const {streamTitle,description,isPrivate,password} = req.body
-    try{
+
+    const user = await User.findOne({ email: owner })
+    if (user.isStreaming) {
+        return res.json({ "message": "Stream is already initialized", "errCode": "SS-001" })
+    } else {
+        await User.updateOne({ email: owner }, { isStreaming: true })
+    }
+
+
+    const { streamTitle, description, isPrivate, password } = req.body
+    try {
         console.log("tryingggg")
         var streamCode = null
         var isNotUnique = null
 
-        do{
+        do {
             streamCode = uID(12)
-            isNotUnique = await Streaming.findOne({streamCode})
-        }while(isNotUnique)
+            isNotUnique = await Streaming.findOne({ streamCode })
+        } while (isNotUnique)
 
         const newStream = new Streaming({
             streamCode,
@@ -81,11 +93,11 @@ router.post("/startStream", verify, async (req, res) => {
             ownerName
         })
         const savedStream = await newStream.save()
-        await User.updateOne({email:owner},{isStreaming : true})
-        await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomOwner:owner,roomId:streamCode}).catch(er => console.log(er))
+        await User.updateOne({ email: owner }, { isStreaming: true })
+        await axios.post('http://10.10.17.15:4000/createRoom', { roomName: streamTitle, roomOwner: owner, roomId: streamCode }).catch(er => console.log(er))
         console.log("done")
-        return res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
-    }catch (err){
+        return res.json({ streamCode: savedStream.streamCode, streamTitle: savedStream.streamTitle, Description: savedStream.Description })
+    } catch (err) {
         console.log(err)
         return res.json(err)
     }
@@ -93,79 +105,81 @@ router.post("/startStream", verify, async (req, res) => {
 })
 
 // Device start stream
-router.post('/deviceStartStream',verify,async(req,res)=>{
+router.post('/deviceStartStream', verify, async (req, res) => {
     console.log("device start")
     console.log(req.body)
     const deviceEmail = req.user.email
-    const {streamTitle,description,isPrivate,password,streamBy} = req.body
-    const _U = await User.findOne({email:streamBy})
-    try{
+    const deviceName = req.user.name
+    const { streamTitle, description, isPrivate, password, streamBy } = req.body
+    const _U = await User.findOne({ email: streamBy })
+    try {
         var streamCode = null
         var isNotUnique = null
-        do{
+        do {
             streamCode = uID(12)
-            isNotUnique = await Streaming.findOne({streamCode})
-        }while(isNotUnique)
+            isNotUnique = await Streaming.findOne({ streamCode })
+        } while (isNotUnique)
 
         const newStream = new Streaming({
             streamCode,
             streamTitle,
             description,
             isPrivate,
+            streamFrom: deviceName,
             password,
-            owner:streamBy,
-            ownerName:_U.name,
-            streamFrom:deviceEmail
+            owner: streamBy,
+            ownerName: _U.name,
+            streamFrom: deviceEmail
         })
         const savedStream = await newStream.save()
-        await User.updateOne({email:streamBy},{currentStream:streamCode,isStreaming:true})
+        await User.updateOne({ email: streamBy }, { currentStream: streamCode, isStreaming: true })
         //await axios.post('http://10.10.15.11:4000/createRoom',{roomName:streamTitle,roomId:streamCode}).catch(er => console.log(er))
-        axios.post('http://10.10.15.11:3001/redirect',{streamBy,streamCode}).catch((er)=> console.log(er))
-        return res.json({streamCode : savedStream.streamCode,streamTitle : savedStream.streamTitle, Description : savedStream.Description})
+        axios.post('http://10.10.17.15:3001/redirect', { streamBy, streamCode }).catch((er) => console.log(er))
+        return res.json({ streamCode: savedStream.streamCode, streamTitle: savedStream.streamTitle, Description: savedStream.Description })
 
 
-    }catch (err){
+    } catch (err) {
         console.log(err)
         return res.json(err)
     }
 })
 
 // Join Stream
-router.post("/joinStream", verify, async(req,res) => {
+router.post("/joinStream", verify, async (req, res) => {
     const email = req.user.email
     const name = req.user.name
     const streamCode = req.body.streamCode
     const password = req.body.pwd
     const domain = 'meet.jit.si';
-    
-    try{
+
+    try {
         //Get stream info
-        const theStream = await Streaming.findOne({streamCode});
+        const theStream = await Streaming.findOne({ streamCode });
         // Check Stream status
-        if (!theStream.isActive){
-            return res.json({message : "Stream is not currently available", errCode : "ST-001"})
+        if (!theStream.isActive) {
+            return res.json({ message: "Stream is not currently available", errCode: "ST-001" })
         }
         // Check Stream privacy
-        if (!theStream.isPrivate){
-            if (!password.equals("") && password.equals(null)){
-                if(!theStream.password.equals(password)){
-                    return res.json({message : "Incorrect password", errCode : "ST-002"})
+        if (!theStream.isPrivate) {
+            if (!password.equals("") && password.equals(null)) {
+                if (!theStream.password.equals(password)) {
+                    return res.json({ message: "Incorrect password", errCode: "ST-002" })
                 }
-            }else{
-                return res.json({message : "Password is required", errCode : "ST-003"})
-            }     
+            } else {
+                return res.json({ message: "Password is required", errCode: "ST-003" })
+            }
         }
 
         // Check ownership
-        if ((theStream.owner === email && theStream.streamFrom == 'none') || (theStream.streamFrom === email)){ // Owner
+        if ((theStream.owner === email && theStream.streamFrom == "Author's cam") || (theStream.streamFrom === email)) { // Owner
             // For Streamer/Lecturer
             const interfaceConfigLecturer = {
                 TOOLBAR_BUTTONS: [
                     'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
-                    'fodeviceselection', 'profile',  'recording',"shortcuts",
+                    'fodeviceselection', 'profile', 'recording', "shortcuts",
                     'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
                     'videoquality', 'filmstrip', 'stats', 'shortcuts',
-                    'tileview', 'videobackgroundblur', 'download', 'help','info'
+                    'tileview', 'videobackgroundblur', 'download', 'help', 'info'
                 ],
                 SETTINGS_SECTIONS: ['devices', 'language', 'moderator'],
                 SHOW_JITSI_WATERMARK: false,
@@ -173,47 +187,47 @@ router.post("/joinStream", verify, async(req,res) => {
                 channelLastN: 1,
                 VERTICAL_FILMSTRIP: true,
                 SET_FILMSTRIP_ENABLED: false
-                
+
             }
             const options = {
                 roomName: streamCode,
-                interfaceConfigOverwrite : interfaceConfigLecturer,
-                userInfo : {
-                email : email
+                interfaceConfigOverwrite: interfaceConfigLecturer,
+                userInfo: {
+                    email: email
                 },
                 channelLastN: 1,
             }
-            if(theStream.streamFrom !== email) await User.updateOne({email},{isStreaming : true})
-            return res.json({options : options, domain : domain, role : "Lecturer", name : name, isStreaming : true})
-        }else{ // Not-Owner
+            if (theStream.streamFrom !== email) await User.updateOne({ email }, { isStreaming: true })
+            return res.json({ options: options, domain: domain, role: "Lecturer", name: name, isStreaming: true })
+        } else { // Not-Owner
             // For Stream Participant - *Not Class Owner*
             const interfaceConfigStudent = {
                 TOOLBAR_BUTTONS: [
                     'closedcaptions', 'fullscreen',
-                     'settings', 'raisehand',
+                    'settings', 'raisehand',
                 ],
                 SETTINGS_SECTIONS: ['language'],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
                 VERTICAL_FILMSTRIP: false,
                 SET_FILMSTRIP_ENABLED: false
-                
+
                 // filmStripOnly: true
             }
             const optionsStudents = {
                 roomName: streamCode,
-                interfaceConfigOverwrite : interfaceConfigStudent,
-                userInfo : {
-                email : email
+                interfaceConfigOverwrite: interfaceConfigStudent,
+                userInfo: {
+                    email: email
                 },
                 channelLastN: 1,
-        };
+            };
             // Send Back Data Lah
-            return res.json({options : optionsStudents, domain : domain, role : "Student", name : name})
+            return res.json({ options: optionsStudents, domain: domain, role: "Student", name: name })
         }
-        
-    }catch(err){
-        return res.json({err})
+
+    } catch (err) {
+        return res.json({ err })
     }
 
 })
@@ -221,51 +235,78 @@ router.post("/joinStream", verify, async(req,res) => {
 // Stop stream
 router.get("/stopStream", verify, async (req, res) => {
     const owner = req.user.email
-    const _S = await Streaming.findOne({owner})
-    try{
+
+    try {
         // Find the stream and set the active state to false
-        const result = await Streaming.updateOne({ owner , isActive : true },{ isActive : false, currentStream:"none" })
-        if (result.n >= 1){
+        const result = await Streaming.updateMany({ owner, isActive: true }, { isActive: false })
+        if (result.n >= 1) {
             // Set isStreaming state of User to false
-            const result2 = await User.updateOne({email:owner},{isStreaming : false})
-            if (result2.n >= 1){
-                return res.json({message : "Stop your current stream as successfully!", status : true})
-            }else{
-                return res.json({message : "Problem Occured during stop streaming process", status : false})
-            }           
-        }else{
-            return res.json({message : "Problem Occured during stop streaming process", status : false})
+            const result2 = await User.updateOne({ email: owner }, { isStreaming: false })
+            if (result2.n >= 1) {
+                return res.json({ message: "Stop your current stream as successfully!", status: true })
+            } else {
+                return res.json({ message: "Problem Occured during stop streaming process", status: false })
+            }
+        } else {
+            return res.json({ message: "Problem Occured during stop streaming process", status: false })
         }
 
-    }catch(err){
+    } catch (err) {
         return res.json(err)
     }
-    //await axios.post('http://10.10.15.11:4000/deleteRoom',{roomId:_S.streamCode}).catch(err => console.log(err))
+})
+
+// Edit stream
+router.post("/editstream", verify, async (req, res) => {
+    const {streamCode,streamTitle,description} = req.body
+    const {role,email} = req.user
+    
+    // Turn me on if you want owner of the stream to change the stream too!
+    // const theStream = Streaming.findOne({owner:email})
+    // if (theStream){
+    //     // Owner : Can change the stream
+    // }else if (role == "Admin") {
+    //     // Admin : Can change the stream
+    // }else{
+    //     // Not Authorized
+    // }
+
+    // Only allow admin to add!
+    if (role != "Admin"){
+        return res.json({"message" : "You are not authorized for the following operation!", "errCode" : "CS-001"})
+    }else{
+        const result = await Streaming.updateOne({streamCode},{streamTitle,description})
+        if (result.n >= 1){
+            return res.json({"message" : "Successfully update the stream's data!"})
+        }else{
+            return res.json({"message" : "An error occured during the process! Failed to update the stream's data!", "errCode" : "CS-002"})
+        }
+    }
 })
 
 // Get currently stream of all class participated
-router.post("/getCurrentlyStream", verify , async (req, res) => {
+router.post("/getCurrentlyStream", verify, async (req, res) => {
     var limit = req.body.limit == null ? 0 : req.body.limit
-    try{
-        const currentlyStreamings = await Streaming.find({isActive : true}).limit(limit).sort({date: -1});
+    try {
+        const currentlyStreamings = await Streaming.find({ isActive: true }).limit(limit).sort({ date: -1 });
         return res.json(currentlyStreamings)
-    }catch(err){
+    } catch (err) {
         return res.json(err)
     }
 
 })
 // Get Stream Detials
-router.post("/getStreamDetail", verify , async (req, res) => {
+router.post("/getStreamDetail", verify, async (req, res) => {
     const streamCode = req.body.streamCode
-    try{
-        const theStream = await Streaming.findOne({streamCode})
+    try {
+        const theStream = await Streaming.findOne({ streamCode })
         return res.json({
-            streamCode : theStream.streamCode,
-            streamTitle : theStream.streamTitle,
-            description : theStream.description,
-            ownerName : theStream.ownerName
+            streamCode: theStream.streamCode,
+            streamTitle: theStream.streamTitle,
+            description: theStream.description,
+            ownerName: theStream.ownerName
         })
-    }catch(err){
+    } catch (err) {
         return res.json(err)
     }
 

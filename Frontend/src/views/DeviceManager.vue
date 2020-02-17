@@ -46,16 +46,34 @@
             </v-col>
             <v-col cols="2" class="d-flex justify-end align-center">
               <div class="mr-5">
-                <v-btn icon @click="deviceId = device.deviceId; rebootDevice()">
-                  <v-icon>mdi-power</v-icon>
-                </v-btn>
-                <v-btn
-                  icon
-                  @click.stop="deviceId = device.deviceId; editDevice = true"
-                  v-if="user.role === 'Admin' && device.streaming === 'none'"
-                >
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{on}">
+                    <v-btn icon @click="deviceId = device.deviceId; rebootDevice()" v-on="on">
+                      <v-icon>mdi-power</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Reboot device</span>
+                </v-tooltip>
+                <v-tooltip bottom v-if="user.role === 'Admin'">
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      icon
+                      @click.stop="deviceId = device.deviceId; editDevice = true"
+                      v-on="on"
+                      >
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Edit device</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-icon>mdi-record</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Stop stream</span>
+                </v-tooltip>
               </div>
             </v-col>
           </v-row>
@@ -90,14 +108,14 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 import io from "socket.io-client";
-
+import {URL} from "../../config"
 export default {
   name: "device-manager",
   data() {
     return {
-      socket: io("http://10.10.15.11:3001"),
+      socket: io(`http://${URL}:3001`),
       editDevice: false,
       devices: [],
       deviceId: "",
@@ -111,15 +129,11 @@ export default {
         console.log(this.devices);
       });
     },  
-    editDeviceName() {
-      this.editDevice = false;
-      axios.put("http://10.10.15.11:3001/devices/changeName", {
-        deviceId: this.deviceId,
-        deviceName: this.deviceName
-      });
-    },
     rebootDevice() {
       console.log("Rebooting");
+    },
+    editDeviceName(){
+      this.socket.emit("changeName",{deviceId,deviceName})
     }
   },
   mounted() {

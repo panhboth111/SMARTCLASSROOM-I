@@ -1,6 +1,7 @@
 import axios from "axios";
 import cookie from "./cookie";
-const url = "http://10.10.15.11:3000/";
+import { URL } from '../config'
+const url = `http://${URL}:3000/`;
 
 class Service {
   // Get UserInfo
@@ -11,13 +12,24 @@ class Service {
       headers: { "auth-token": token }
     });
   }
- 
+
+  // Get Users info
+  static getAllUsers() {
+    const token = cookie.getCookie("auth-token");
+    return axios.get(`${url}users/allUsers`, {
+      params: {},
+      headers: { "auth-token": token }
+    });
+  }
+
   // Start Stream
-  static getCurrentlyStreaming(limit) {
+  static getCurrentlyStreaming(limit,status) {
     const token = cookie.getCookie("auth-token");
     return axios.post(
-      `${url}users/getCurrentlyStream`,
-      { limit },
+      `${url}streams/getCurrentlyStream`,
+      { limit,
+        status
+      },
       {
         params: {},
         headers: { "auth-token": token }
@@ -26,20 +38,20 @@ class Service {
   }
 
   // Start Stream
-  static startStream(streamTitle, description, isPrivate, password,streamBy,role) {
+  static startStream(streamTitle, description, isPrivate, password, streamBy, role) {
     console.log("Start")
     const token = cookie.getCookie("auth-token");
-    const route = (role==='Device')?'deviceStartStream':'startStream'
+    const route = (role === 'Device') ? 'deviceStartStream' : 'startStream'
     console.log(streamTitle + description + isPrivate + password);
     return axios.post(
-      `${url}users/${route}`,
+      `${url}streams/${route}`,
       {
         streamTitle,
         description,
         isPrivate,
         password,
         streamBy
-      },  
+      },
       { params: {}, headers: { "auth-token": token } }
     );
   }
@@ -49,7 +61,7 @@ class Service {
   static async joinStream(streamCode, pwd) {
     const token = cookie.getCookie("auth-token");
     const result = await axios.post(
-      `${url}users/joinStream`,
+      `${url}streams/joinStream`,
       {
         streamCode,
         pwd
@@ -64,14 +76,29 @@ class Service {
     }
   }
 
-  // Stop stream
-  static async stopStream() {
+  // Edit Stream
+  static async editStream(streamCode,streamTitle,description){
     const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
-    const result = await axios.get(`${url}users/stopStream`, {
+    const result = await axios.post(`${url}streams/editstream`, {
+      streamCode,
+      streamTitle,
+      description
+    }, {
       params: {},
       headers: { "auth-token": token }
     });
-    
+
+    return result.data
+  }
+
+  // Stop stream
+  static async stopStream() {
+    const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
+    const result = await axios.get(`${url}streams/stopStream`, {
+      params: {},
+      headers: { "auth-token": token }
+    });
+
     if (result.data.status) {
       window.location.replace("/home");
     }
@@ -81,7 +108,7 @@ class Service {
   static getStreamDetail(streamCode) {
     const token = cookie.getCookie("auth-token");
     return axios.post(
-      `${url}users/getStreamDetail`,
+      `${url}streams/getStreamDetail`,
       { streamCode },
       { params: {}, headers: { "auth-token": token } }
     );
@@ -94,6 +121,20 @@ class Service {
       pwd,
       name
     });
+  }
+
+  // Change userRole
+  static async changeRole(email, role) {
+    const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
+    const result = await axios.post(`${url}users/changeRole`, {
+      email,
+      role
+    }, {
+      params: {},
+      headers: { "auth-token": token }
+    });
+
+    return result.data
   }
 
   // Post Data for login
@@ -112,6 +153,7 @@ class Service {
       return { message: credential.data.message };
     }
   }
+
   static async deviceLogin(email, pwd) {
     const credential = await axios.post(`${url}auth/login`, {
       email,
@@ -132,6 +174,19 @@ class Service {
   static async logout() {
     cookie.setCookie("auth-token", "", 30);
     localStorage.setItem("LastLogged", Date.now());
+  }
+
+  // Get All Chats
+  static async getAllChat(roomId){
+    const chat = await axios.post(`http://localhost:4000/getChat`, {
+      roomId
+    });
+    if (chat.data != undefined){
+      console.log(chat)
+      return {chats : chat.data.chats, questions : chat.data.questions, announcement : chat.data.announcement}
+    }else{
+      return null
+    }
   }
 }
 
