@@ -1,8 +1,12 @@
 <template>
   <v-app>
-    <Navbar v-if="$route.name !== 'login' && $route.name !== 'device-login'" />
+    <Navbar
+      v-if="
+        $route.name !== 'login' && $route.name !== 'device-login' && isLoaded
+      "
+    />
     <v-content>
-      <router-view :user="user"></router-view>
+      <router-view :user="user" v-if="isLoaded"></router-view>
     </v-content>
   </v-app>
 </template>
@@ -12,14 +16,14 @@ import Navbar from "./components/NavbarComponents/Navbar";
 // import backend from "./Service";
 import auth from "./auth";
 import synclog from "./synclog";
-import { mapState } from "vuex";
+//import { mapState } from "vuex";
+import { getUserInfo } from "./store/user-module/types";
 
 export default {
   name: "App",
   methods: {
     async getUser() {
-      const user = await backend.getUserInfo();
-      this.$state.commit("getUser", user.data);
+      await this.$store.dispatch(getUserInfo);
     },
     async redirectUnauthorized() {
       if (
@@ -34,12 +38,17 @@ export default {
   },
 
   data: () => ({}),
+  // computed: {
+  //   ...mapState(["user"])
+  // },
   computed: {
-    ...mapState(["user"])
+    isLoaded() {
+      return this.$store.getters.user.name !== undefined;
+    }
   },
-  created() {
+  async created() {
+    await this.getUser();
     this.redirectUnauthorized();
-    this.getUser();
     auth();
     synclog;
   }

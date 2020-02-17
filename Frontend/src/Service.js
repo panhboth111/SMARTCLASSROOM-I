@@ -1,6 +1,6 @@
 import axios from "axios";
 import cookie from "./cookie";
-import { URL } from '../config'
+import { URL } from "../config";
 const url = `http://${URL}:3000/`;
 
 class Service {
@@ -23,13 +23,11 @@ class Service {
   }
 
   // Start Stream
-  static getCurrentlyStreaming(limit,status) {
+  static getCurrentlyStreaming(limit, status) {
     const token = cookie.getCookie("auth-token");
     return axios.post(
       `${url}streams/getCurrentlyStream`,
-      { limit,
-        status
-      },
+      { limit, status },
       {
         params: {},
         headers: { "auth-token": token }
@@ -38,10 +36,17 @@ class Service {
   }
 
   // Start Stream
-  static startStream(streamTitle, description, isPrivate, password, streamBy, role) {
-    console.log("Start")
+  static startStream(
+    streamTitle,
+    description,
+    isPrivate,
+    password,
+    streamBy,
+    role
+  ) {
+    console.log("Start");
     const token = cookie.getCookie("auth-token");
-    const route = (role === 'Device') ? 'deviceStartStream' : 'startStream'
+    const route = role === "Device" ? "deviceStartStream" : "startStream";
     console.log(streamTitle + description + isPrivate + password);
     return axios.post(
       `${url}streams/${route}`,
@@ -55,7 +60,6 @@ class Service {
       { params: {}, headers: { "auth-token": token } }
     );
   }
-
 
   // Join Stream
   static async joinStream(streamCode, pwd) {
@@ -77,18 +81,22 @@ class Service {
   }
 
   // Edit Stream
-  static async editStream(streamCode,streamTitle,description){
+  static async editStream(streamCode, streamTitle, description) {
     const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
-    const result = await axios.post(`${url}streams/editstream`, {
-      streamCode,
-      streamTitle,
-      description
-    }, {
-      params: {},
-      headers: { "auth-token": token }
-    });
+    const result = await axios.post(
+      `${url}streams/editstream`,
+      {
+        streamCode,
+        streamTitle,
+        description
+      },
+      {
+        params: {},
+        headers: { "auth-token": token }
+      }
+    );
 
-    return result.data
+    return result.data;
   }
 
   // Stop stream
@@ -126,15 +134,19 @@ class Service {
   // Change userRole
   static async changeRole(email, role) {
     const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
-    const result = await axios.post(`${url}users/changeRole`, {
-      email,
-      role
-    }, {
-      params: {},
-      headers: { "auth-token": token }
-    });
+    const result = await axios.post(
+      `${url}users/changeRole`,
+      {
+        email,
+        role
+      },
+      {
+        params: {},
+        headers: { "auth-token": token }
+      }
+    );
 
-    return result.data
+    return result.data;
   }
 
   // Post Data for login
@@ -143,15 +155,14 @@ class Service {
       email,
       pwd
     });
-    const { token } = credential.data;
-    if (token) {
+    const { message, success, token } = credential.data;
+    if (success) {
       cookie.setCookie("auth-token", token, 30); //window.localStorage.setItem("auth-token",token)
       localStorage.setItem("LastLogged", Date.now());
+      alert(message);
       window.location.replace("/home");
-      return null;
-    } else {
-      return { message: credential.data.message };
     }
+    return message;
   }
 
   static async deviceLogin(email, pwd) {
@@ -177,15 +188,19 @@ class Service {
   }
 
   // Get All Chats
-  static async getAllChat(roomId){
+  static async getAllChat(roomId) {
     const chat = await axios.post(`http://localhost:4000/getChat`, {
       roomId
     });
-    if (chat.data != undefined){
-      console.log(chat)
-      return {chats : chat.data.chats, questions : chat.data.questions, announcement : chat.data.announcement}
-    }else{
-      return null
+    if (chat.data != undefined) {
+      console.log(chat);
+      return {
+        chats: chat.data.chats,
+        questions: chat.data.questions,
+        announcement: chat.data.announcement
+      };
+    } else {
+      return null;
     }
   }
 }
