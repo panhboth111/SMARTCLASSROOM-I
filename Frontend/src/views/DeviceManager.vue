@@ -58,7 +58,7 @@
                   <template v-slot:activator="{ on }">
                     <v-btn
                       icon
-                      @click.stop="deviceId = device.deviceId; editDevice = true"
+                      @click.stop="toEdit(device.deviceId,device.deviceName)"
                       v-on="on"
                       >
                       <v-icon>mdi-pencil</v-icon>
@@ -118,8 +118,8 @@ export default {
       socket: io(`http://${URL}:3001`),
       editDevice: false,
       devices: [],
-      deviceId: "",
-      deviceName: ""
+      deviceId: "none",
+      deviceName: "none"
     };
   },
   methods: {
@@ -133,7 +133,13 @@ export default {
       console.log("Rebooting");
     },
     editDeviceName(){
-      this.socket.emit("changeName",{deviceId,deviceName})
+      this.socket.emit("changeName",{deviceId : this.deviceId,deviceName : this.deviceName})
+      this.editDevice = false
+    },
+    toEdit(id,name){
+      this.deviceId = id
+      this.deviceName = name
+      this.editDevice = true
     }
   },
   mounted() {

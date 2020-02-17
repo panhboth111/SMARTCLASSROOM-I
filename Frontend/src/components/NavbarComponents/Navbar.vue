@@ -74,6 +74,7 @@ export default {
   data: () => {
     return {
       socket: io(`http://${URL}:3001`),
+      socket2: io(`http://${URL}:3002`),
       stream_drawer: false,
       drawer: false,
       item: 1,
@@ -103,6 +104,9 @@ export default {
   },
   created() {
     console.log(this.$route);
+    this.socket2.on(`stopStream`,(streamCode)=>{
+      if(window.location.href.split("stream/")[1] == streamCode) window.location.replace('/home')
+    } )
   }
 };
 </script>

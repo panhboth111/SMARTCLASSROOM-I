@@ -3,6 +3,7 @@ const Credential = require('../models/credential')
 const Streaming = require('../models/streaming')
 const uID = require("../utilities/UniqueCode")
 const axios = require('axios')
+const io = require('../loaders/io')
 
 class StreamService {
     async startStream({owner,ownerName},{ streamTitle, description, isPrivate, password }){
@@ -80,7 +81,8 @@ class StreamService {
                 //Get stream info
                 const theStream = await Streaming.findOne({ streamCode });
                 // Check Stream status
-                if (!theStream.isActive) resolve({ message: "Stream is not currently available", errCode: "ST-001" })
+                console.log(theStream.isActive)
+                if (!theStream.isActive) return resolve({ message: "Stream is not currently available", errCode: "ST-001" })
                 // Check Stream privacy
                 if (!theStream.isPrivate) {
                     if (!password.equals("") && password.equals(null)) {
@@ -156,6 +158,7 @@ class StreamService {
         return new Promise(async (resolve,reject)=>{
             try {
                 // Find the stream and set the active state to false
+                const stream = await Streaming.findOne({owner,isActive:true})
                 const result = await Streaming.updateMany({ owner, isActive: true }, { isActive: false })
                 console.log(result)
                 if (result.n >= 1) {
@@ -163,7 +166,8 @@ class StreamService {
                     const result2 = await User.updateOne({ email: owner }, { isStreaming: false })
                     console.log(result2)
                     if (result2.n >= 1) {
-                        console.log("done")
+                        const streamCode = stream.streamCode
+                        io.emit(`stopStream`,streamCode)
                         resolve({ message: "Stop your current stream as successfully!", status: true })
                     } else {
                         resolve({ message: "Problem Occured during stop streaming process", status: false })
