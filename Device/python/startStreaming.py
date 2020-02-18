@@ -5,7 +5,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import sys
 import time
 
-url = 'http://10.10.17.15:8080/device-login'
+url = 'http://localhost:8080/device-login'
+#url = 'http://10.10.17.15:8080/device-login'
 email = sys.argv[1]
 password = sys.argv[2]
 streamTitle = sys.argv[3]

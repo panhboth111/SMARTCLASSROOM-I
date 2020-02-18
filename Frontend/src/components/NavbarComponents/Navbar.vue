@@ -134,8 +134,8 @@ export default {
     },
     stopStream() {
       console.log("stopping.......");
-      backend.stopStream();
       this.socket.emit("stop", this.user.email);
+      setTimeout(() => backend.stopStream(), 2000);
     }
   },
   // computed: {

@@ -161,7 +161,7 @@
             color="black darken-1"
             class="font-weight-black"
             text
-            @click="is_from_webcam ? startStream() : deviceStartStream()"
+            @click="stream()"
             >Continue</v-btn
           >
           <v-overlay :value="loading" v-if="devices">
@@ -287,13 +287,16 @@ export default {
         description: this.description
       });
       this.socket.on("redirect", async ({ streamBy, streamCode }) => {
-        console.log(streamBy);
-        console.log(this.user.email);
-        console.log(streamCode);
-        location.reload();
-        if (this.user.email == streamBy) {
-          window.location.replace(`/stream/${streamCode}`);
-        }
+        this.socket.emit("startCasting", {
+          streamCode,
+          deviceIds,
+          usedBy: this.user.email
+        });
+        setTimeout(() => {
+          if (this.user.email == streamBy) {
+            location.replace(`/stream/${streamCode}`);
+          }
+        }, 3000);
       });
     }
   },
