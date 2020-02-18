@@ -135,6 +135,9 @@ export default {
             this.api = new JitsiMeetExternalAPI(domain, options);
             this.api.executeCommand('displayName', name);
             this.api.executeCommand('subject', streamTitle);
+            if (role != "Lecturer"){
+              this.api.executeCommand('toggleVideo')
+            }
         });
     }
   }

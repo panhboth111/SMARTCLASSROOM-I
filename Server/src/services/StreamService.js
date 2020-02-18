@@ -108,7 +108,7 @@ class StreamService {
   }
   async joinStream({ email, name }, { streamCode, password }) {
     return new Promise(async (resolve, reject) => {
-      const domain = "meet.jit.si";
+      const domain = "jitsi.vkirirom.org";
       try {
         //Get stream info
         const theStream = await Streaming.findOne({ streamCode });
@@ -187,7 +187,8 @@ class StreamService {
             userInfo: {
               email: email
             },
-            channelLastN: 1
+            channelLastN: 1,
+            startVideoMuted: 1
           };
           if (theStream.streamFrom !== email)
             await User.updateOne({ email }, { isStreaming: true });
@@ -196,7 +197,8 @@ class StreamService {
             domain: domain,
             role: "Lecturer",
             name: name,
-            isStreaming: true
+            isStreaming: true,
+            startWithVideoMuted: true
           });
           }else {
           // Not-Owner
@@ -222,7 +224,8 @@ class StreamService {
             userInfo: {
               email: email
             },
-            channelLastN: 1
+            channelLastN: 1,
+            startWithVideoMuted: true
           };
           // Send Back Data Lah
           resolve({
