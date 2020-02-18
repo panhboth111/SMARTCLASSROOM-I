@@ -312,7 +312,7 @@ class StreamService {
   async editStream({ streamCode, streamTitle, description }, { role, email }) {
     return new Promise(async (resolve, reject) => {
       if (role != "Admin")
-        resove({
+        resolve({
           message: "You are not authorized for the following operation!",
           errCode: "CS-001"
         });

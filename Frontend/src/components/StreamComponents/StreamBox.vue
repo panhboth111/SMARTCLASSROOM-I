@@ -107,6 +107,11 @@ export default {
   async created() {
     this.getStreamDetails()
   },
+  destroyed(){
+    console.log("stopping.......");
+    backend.stopStream();
+    // this.socket.emit('stop',this.user.email)
+  },
   methods: {
     async getStreamDetails() {
       const streamDetail = await backend.getStreamDetail(
@@ -131,9 +136,6 @@ export default {
             this.api.executeCommand('subject', streamTitle);
         });
     }
-  },
-  mounted(){
-    
   }
 };
 
