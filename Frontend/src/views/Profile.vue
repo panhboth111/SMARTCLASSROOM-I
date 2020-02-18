@@ -53,7 +53,7 @@
           </v-tooltip>
 
           <div class="profileInfo">
-            <v-avatar size="130" color="black" class="profilePic mb-2">
+            <v-avatar size="130" class=" profilePic mb-2">
               <v-avatar size="120" class @click="showProfilePic = true">
                 <img :src="user.profilePic" />
               </v-avatar>
@@ -112,7 +112,7 @@
     <v-dialog v-model="showCoverPic" width="1000px">
       <v-card>
         <v-container>
-          <v-img :src="coverPicURL"></v-img>
+          <v-img :src="user.coverPic"></v-img>
         </v-container>
       </v-card>
     </v-dialog>
@@ -120,7 +120,7 @@
     <v-dialog v-model="showProfilePic" width="1000px">
       <v-card>
         <v-container>
-          <v-img :src="profilePicURL"></v-img>
+          <v-img :src="user.profilePic"></v-img>
         </v-container>
       </v-card>
     </v-dialog>
@@ -200,36 +200,6 @@ export default {
       confirmPassword: "",
       errorMsg: "",
       streams: [
-        {
-          img_url: "https://cdn.vuetifyjs.com/images/cards/sunshine.jpg",
-          title: "Introduction to pissing",
-          author: "Hun Vikran"
-        },
-        {
-          img_url: "https://cdn.vuetifyjs.com/images/cards/sunshine.jpg",
-          title: "Introduction to pissing",
-          author: "Hun Vikran"
-        },
-        {
-          img_url: "https://cdn.vuetifyjs.com/images/cards/sunshine.jpg",
-          title: "Introduction to pissing",
-          author: "Hun Vikran"
-        },
-        {
-          img_url: "https://cdn.vuetifyjs.com/images/cards/sunshine.jpg",
-          title: "Introduction to pissing",
-          author: "Hun Vikran"
-        },
-        {
-          img_url: "https://cdn.vuetifyjs.com/images/cards/sunshine.jpg",
-          title: "Introduction to pissing",
-          author: "Hun Vikran"
-        },
-        {
-          img_url: "https://cdn.vuetifyjs.com/images/cards/sunshine.jpg",
-          title: "Introduction to pissing",
-          author: "Hun Vikran"
-        }
       ]
     };
   },
@@ -254,7 +224,7 @@ export default {
         this.coverPicURL = fileReader.result;
         const response = await backend.changeCover(this.coverPicURL);
         alert(response.message);
-        location.reload();
+        window.location.reload();
       });
     },
     async onProfilePicPicked(event) {
@@ -268,7 +238,7 @@ export default {
         this.profilePicURL = fileReader.result;
         const response = await backend.changeProfile(this.profilePicURL);
         alert(response.message);
-        location.reload();
+        window.location.reload();
       });
     },
     editProfile() {
