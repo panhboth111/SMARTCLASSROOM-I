@@ -128,6 +128,7 @@ export default {
     async streamOn(streamCode,streamTitle){
         // eslint-disable-next-line no-unused-vars
         const {domain, options, role, name} = await backend.joinStream(streamCode,"")
+        console.log(domain)
         this.api = null
         $( document ).ready(function() {
             options["parentNode"] = document.querySelector('#newStreamRoom');

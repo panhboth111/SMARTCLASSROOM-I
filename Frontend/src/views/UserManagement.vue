@@ -3,7 +3,7 @@
     <v-row class="ml-1 mt-8 mb-10">
       <h1 class="display-1">User Management</h1>
       <v-spacer></v-spacer>
-      <v-btn text small>Refresh</v-btn>
+      <v-btn text small @click="refresh()">Refresh</v-btn>
     </v-row>
     <v-data-table
       :items="users"
@@ -66,8 +66,8 @@ export default {
   methods: {
     // On User Click
     onUserClick(user){
-      this.userName = user.username
-      this.userEmail = user.userEmail,
+      this.userName = user.name
+      this.userEmail = user.email,
       this.userRole = user.role
       this.editUserModal = true
     },
@@ -81,7 +81,6 @@ export default {
         this.userName = this.userEmail = this.userRole = ""
         this.getAllUsers()
         this.editUserModal = false
-
       }
     },
 
@@ -91,8 +90,11 @@ export default {
       let _users = await backend.getAllUsers()
       _users = _users.data
       this.users = [..._users].filter(_user => _user.role !== "Device")
-    }
+    },
     
+    async refresh(){
+      this.getAllUsers()
+    }
   },
   created(){
     this.getAllUsers()

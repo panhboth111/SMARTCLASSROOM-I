@@ -36,7 +36,7 @@ class StreamService {
           ownerName
         });
         const savedStream = await newStream.save();
-        console.log(owner);
+        // console.log(owner);
         await new History({
           action: "Started a stream",
           streamCode,
@@ -45,7 +45,7 @@ class StreamService {
         }).save();
         await User.updateOne({ email: owner }, { isStreaming: true });
         //await axios.post('http://10.10.15.11:4000/createRoom', { roomName: streamTitle, roomOwner: owner, roomId: streamCode }).catch(er => console.log(er))
-        console.log("done");
+        // console.log("done");
         resolve({
           streamCode: savedStream.streamCode,
           streamTitle: savedStream.streamTitle,
@@ -115,17 +115,20 @@ class StreamService {
         await new History({
           action: "Joined a stream",
           streamCode,
-          streamTitle,
+          streamTitle : theStream.streamTitle,
           email
         }).save();
         // Check Stream status
-        if (!theStream.isActive)
+        if (!theStream.isActive){
+          console.log("Stuck at stream active")
           resolve({
             message: "Stream is not currently available",
             errCode: "ST-001"
           });
+        }
         // Check Stream privacy
         if (!theStream.isPrivate) {
+          console.log("Stuck at stream active")
           if (!password.equals("") && password.equals(null)) {
             if (!theStream.password.equals(password)) {
               resolve({ message: "Incorrect password", errCode: "ST-002" });
@@ -137,15 +140,15 @@ class StreamService {
             });
           }
         }
+        console.log("Testing")
+        console.log(theStream.owner === email)
+        console.log(theStream.streamFrom == "Author's cam")
+        console.log( theStream.streamFrom === email)
         // Check ownership
-        if (
-          (theStream.owner === email &&
-            theStream.streamFrom == "Author's cam") ||
-          theStream.streamFrom === email
-        ) {
+        if ((theStream.owner === email && theStream.streamFrom == "Author's cam") || theStream.streamFrom === email) {
           // Owner
           // For Streamer/Lecturer
-          const interfaceConfigLecturer = {
+          const interfaceConfigLecturer = { 
             TOOLBAR_BUTTONS: [
               "microphone",
               "camera",
@@ -195,7 +198,7 @@ class StreamService {
             name: name,
             isStreaming: true
           });
-        } else {
+          }else {
           // Not-Owner
           // For Stream Participant - *Not Class Owner*
           const interfaceConfigStudent = {
@@ -230,6 +233,7 @@ class StreamService {
           });
         }
       } catch (err) {
+        console.log(err)
         resolve({ err });
       }
     });
@@ -242,16 +246,16 @@ class StreamService {
           { owner, isActive: true },
           { isActive: false }
         );
-        console.log(result);
+        // console.log(result);
         if (result.n >= 1) {
           // Set isStreaming state of User to false
           const result2 = await User.updateOne(
             { email: owner },
             { isStreaming: false }
           );
-          console.log(result2);
+          // console.log(result2);
           if (result2.n >= 1) {
-            console.log("done");
+            // console.log("done");
             resolve({
               message: "Stop your current stream as successfully!",
               status: true
@@ -277,7 +281,7 @@ class StreamService {
     return new Promise(async (resolve, reject) => {
       try {
         let currentlyStreamings;
-        console.log(status);
+        // console.log(status);
         if (status == null) {
           currentlyStreamings = await Streaming.find()
             .limit(limit)
@@ -287,7 +291,7 @@ class StreamService {
             .limit(limit)
             .sort({ date: -1 });
         }
-        console.log(currentlyStreamings);
+        // console.log(currentlyStreamings);
         resolve(currentlyStreamings);
       } catch (err) {
         resolve(err);
