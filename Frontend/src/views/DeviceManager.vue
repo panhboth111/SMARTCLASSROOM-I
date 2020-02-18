@@ -13,7 +13,10 @@
           <span class="title font-weight-regular">Edit device</span>
         </v-card-title>
         <v-card-text>
-          <v-text-field v-model="deviceName" label="Enter a new device name"></v-text-field>
+          <v-text-field
+            v-model="deviceName"
+            label="Enter a new device name"
+          ></v-text-field>
         </v-card-text>
 
         <v-card-actions>
@@ -39,16 +42,25 @@
               <div class="headline">{{ device.deviceName }}</div>
               <div
                 :class="
-                    (device.online ? 'green--text' : 'red--text') +
-                      ' font-weight-bold body-1 text-uppercase mt-4'
-                  "
-              >{{ device.online ? "Online" : "Offline" }}</div>
+                  (device.online ? 'green--text' : 'red--text') +
+                    ' font-weight-bold body-1 text-uppercase mt-4'
+                "
+              >
+                {{ device.online ? "Online" : "Offline" }}
+              </div>
             </v-col>
             <v-col cols="2" class="d-flex justify-end align-center">
               <div class="mr-5">
                 <v-tooltip bottom>
-                  <template v-slot:activator="{on}">
-                    <v-btn icon @click="deviceId = device.deviceId; rebootDevice()" v-on="on">
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      icon
+                      @click="
+                        deviceId = device.deviceId;
+                        rebootDevice();
+                      "
+                      v-on="on"
+                    >
                       <v-icon>mdi-power</v-icon>
                     </v-btn>
                   </template>
@@ -58,9 +70,16 @@
                   <template v-slot:activator="{ on }">
                     <v-btn
                       icon
+<<<<<<< HEAD
+                      @click.stop="
+                        deviceId = device.deviceId;
+                        editDevice = true;
+                      "
+=======
                       @click.stop="toEdit(device.deviceId,device.deviceName)"
+>>>>>>> 62c7c45c4e427fbaba5fd90774ca7a812bbd41cc
                       v-on="on"
-                      >
+                    >
                       <v-icon>mdi-pencil</v-icon>
                     </v-btn>
                   </template>
@@ -85,18 +104,21 @@
           </v-expansion-panel-header>
           <v-expansion-panel-content>
             <div class="subtitle-1">
-              <span class="font-weight-bold" :class="device.online ? 'green--text' : 'red--text'">
+              <span
+                class="font-weight-bold"
+                :class="device.online ? 'green--text' : 'red--text'"
+              >
                 {{
-                device.cameraPlugged ? "Camera Connected " : "Camera Not Connected"
+                  device.cameraPlugged
+                    ? "Camera Connected "
+                    : "Camera Not Connected"
                 }}
               </span>
               <!-- {{ device.cameraPlugged}} -->
             </div>
             <div class="subtitle-1">
               <span class="font-weight-bold">
-                {{
-                device.streaming ? "Currently Streaming: " : ""
-                }}
+                {{ device.streaming ? "Currently Streaming: " : "" }}
               </span>
               {{ device.streaming ? "" : "Not Streaming" }}
             </div>
@@ -110,7 +132,7 @@
 <script>
 // import axios from "axios";
 import io from "socket.io-client";
-import {URL} from "../../config"
+import { URL } from "../../config";
 export default {
   name: "device-manager",
   data() {
@@ -128,7 +150,7 @@ export default {
         this.devices = device_info;
         console.log(this.devices);
       });
-    },  
+    },
     rebootDevice() {
       console.log("Rebooting");
     },
@@ -142,9 +164,13 @@ export default {
       this.editDevice = true
     }
   },
-  mounted() {
+  created() {
     this.getDevices();
+    this.socket.emit("here", "hiii");
   },
+  // mounted() {
+  //   this.getDevices();
+  // },
   props: {
     user: Object
   }

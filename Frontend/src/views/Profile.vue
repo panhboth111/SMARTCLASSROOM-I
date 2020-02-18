@@ -95,7 +95,7 @@
           <v-col v-for="(stream, i) in user.history" :key="i" :lg="6" :md="12">
             <v-card dark @click="myClickEvent">
               <v-img
-                :src="stream.img_url"
+                :src="coverPicURL"
                 class="white--text align-end"
                 height="240px"
                 alt="pic"

@@ -21,14 +21,20 @@ import { getUserInfo } from "./store/user-module/types";
 
 export default {
   name: "App",
+  data() {
+    return {
+      user: {}
+    };
+  },
   methods: {
     async getUser() {
       await this.$store.dispatch(getUserInfo);
+      this.user = this.$store.getters.user;
     },
     async redirectUnauthorized() {
       if (
         window.location.pathname === "/devices" &&
-        (this.user.role !== "Admin" || this.user.role !== "Lecturer")
+        (this.user.role !== "Admin" || this.user.role !== "Admin")
       )
         window.location.replace("/");
     }
@@ -36,8 +42,6 @@ export default {
   components: {
     Navbar
   },
-
-  data: () => ({}),
   // computed: {
   //   ...mapState(["user"])
   // },
