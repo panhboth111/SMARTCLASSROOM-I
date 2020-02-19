@@ -126,16 +126,22 @@ class Service {
   }
 
   // Stop stream
-  static async stopStream() {
+  static async stopStream(usedBy = "user", streamCode = "none") {
+    let route = usedBy === "admin" ? "adminStopStream" : "stopStream";
     const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
-    const result = await axios.get(`${url}streams/stopStream`, {
-      params: {},
-      headers: { "auth-token": token }
-    });
-
-    if (result.data.status) {
-      window.location.replace("/home");
-    }
+    const result = await axios
+      .post(
+        `${url}streams/${route}`,
+        {
+          streamCode
+        },
+        {
+          params: {},
+          headers: { "auth-token": token }
+        }
+      )
+      .catch(err => alert(err));
+    return result;
   }
 
   // Get Stream detail

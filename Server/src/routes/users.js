@@ -12,7 +12,6 @@ router.get("/allUsers", verify, async (req, res) => {
 
 // Get user Info
 router.get("/user", verify, async (req, res) => {
-  console.log("reached");
   const user = await userService.user(req.user);
   return res.json(user);
 });
@@ -35,7 +34,6 @@ router.post("/changeProfile", verify, async (req, res) => {
 });
 router.get("/userHistory", verify, async (req, res) => {
   const response = await userService.getUserHistory(req.user);
-  console.log(response);
   return res.json(response);
 });
 

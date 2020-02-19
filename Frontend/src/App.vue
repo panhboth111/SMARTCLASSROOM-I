@@ -57,7 +57,7 @@ export default {
         window.location.pathname != "/" &&
         this.$store.getters.user.name == undefined
       )
-        false;
+        loaded = false;
       else loaded = true;
       return loaded;
     }

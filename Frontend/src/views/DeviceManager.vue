@@ -70,14 +70,7 @@
                   <template v-slot:activator="{ on }">
                     <v-btn
                       icon
-<<<<<<< HEAD
-                      @click.stop="
-                        deviceId = device.deviceId;
-                        editDevice = true;
-                      "
-=======
-                      @click.stop="toEdit(device.deviceId,device.deviceName)"
->>>>>>> 62c7c45c4e427fbaba5fd90774ca7a812bbd41cc
+                      @click.stop="toEdit(device.deviceId, device.deviceName)"
                       v-on="on"
                     >
                       <v-icon>mdi-pencil</v-icon>
@@ -154,14 +147,17 @@ export default {
     rebootDevice() {
       console.log("Rebooting");
     },
-    editDeviceName(){
-      this.socket.emit("changeName",{deviceId : this.deviceId,deviceName : this.deviceName})
-      this.editDevice = false
+    editDeviceName() {
+      this.socket.emit("changeName", {
+        deviceId: this.deviceId,
+        deviceName: this.deviceName
+      });
+      this.editDevice = false;
     },
-    toEdit(id,name){
-      this.deviceId = id
-      this.deviceName = name
-      this.editDevice = true
+    toEdit(id, name) {
+      this.deviceId = id;
+      this.deviceName = name;
+      this.editDevice = true;
     }
   },
   created() {

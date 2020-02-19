@@ -31,11 +31,8 @@ class UserService {
       if (reg.test(email)) role = "Student";
       else if (Devreg.test(email)) role = "Device";
       else resolve({ message: "Only KIT email is allowed", errCode: "SU-001" });
-      console.log("here");
       bcrypt.genSalt(10, async (err, salt) => {
-        console.log("1");
         bcrypt.hash(pwd, salt, async (err, hash) => {
-          console.log("2");
           if (err) reject(err);
           try {
             const credential = new Credential({

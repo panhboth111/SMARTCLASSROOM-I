@@ -4,13 +4,13 @@ const History = require("../models/history");
 const Streaming = require("../models/streaming");
 const uID = require("../utilities/UniqueCode");
 const axios = require("axios");
+const io = require("../loaders/io");
 
 class StreamService {
   async startStream(
     { owner, ownerName },
     { streamTitle, description, isPrivate, password }
   ) {
-    console.log(`${owner} ${ownerName}`);
     return new Promise(async (resolve, reject) => {
       const user = await User.findOne({ email: owner });
       if (user.isStreaming)
@@ -36,7 +36,6 @@ class StreamService {
           ownerName
         });
         const savedStream = await newStream.save();
-        console.log(owner);
         await new History({
           action: "Started a stream",
           streamCode,
@@ -115,7 +114,7 @@ class StreamService {
         await new History({
           action: "Joined a stream",
           streamCode,
-          streamTitle,
+          streamTitle: theStream.streamTitle,
           email
         }).save();
         // Check Stream status
@@ -234,6 +233,57 @@ class StreamService {
       }
     });
   }
+  async adminStopStream({ role }, { streamCode }) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (role != "Admin") {
+          return resolve({
+            message:
+              "You are not authorized to complete the following operation!",
+            errCode: "ASS-001"
+          });
+        }
+        // Find the stream
+        const theStream = await Streaming.findOne({ streamCode });
+        // If the stream is available
+        if (theStream) {
+          // Update the owner streaming status
+          const result = await User.updateOne(
+            { email: theStream.owner },
+            { isStreaming: false }
+          );
+          // If update owner streaming status succeed
+          if (result.n == 1) {
+            // Deactivate the stream
+            const result2 = await Streaming.updateOne(
+              { streamCode },
+              { isActive: false }
+            );
+            // If deactivation succeed
+            if (result2.n == 1) {
+              return resolve({ message: "Stop Stream as successfully!" });
+            }
+          } else {
+            return resolve({
+              message: "Error occured when trying to change User status!",
+              errCode: "ASS-002"
+            });
+          }
+        } else {
+          return resolve({
+            message: "No stream with " + streamCode + "was found",
+            errCode: "ASS-003"
+          });
+        }
+      } catch (error) {
+        return resolve({
+          message: "Error occured when stopping the stream",
+          errCode: "ASS-004"
+        });
+      }
+    });
+  }
+
   async stopStream(owner) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -242,21 +292,20 @@ class StreamService {
           { owner, isActive: true },
           { isActive: false }
         );
-        console.log(result);
         if (result.n >= 1) {
           // Set isStreaming state of User to false
           const result2 = await User.updateOne(
             { email: owner },
             { isStreaming: false }
           );
-          console.log(result2);
           if (result2.n >= 1) {
-            console.log("done");
+            console.log("successful");
             resolve({
               message: "Stop your current stream as successfully!",
               status: true
             });
           } else {
+            console.log("error");
             resolve({
               message: "Problem Occured during stop streaming process",
               status: false
@@ -277,7 +326,6 @@ class StreamService {
     return new Promise(async (resolve, reject) => {
       try {
         let currentlyStreamings;
-        console.log(status);
         if (status == null) {
           currentlyStreamings = await Streaming.find()
             .limit(limit)
@@ -287,7 +335,6 @@ class StreamService {
             .limit(limit)
             .sort({ date: -1 });
         }
-        console.log(currentlyStreamings);
         resolve(currentlyStreamings);
       } catch (err) {
         resolve(err);

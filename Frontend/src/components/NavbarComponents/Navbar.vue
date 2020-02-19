@@ -133,10 +133,17 @@ export default {
       backend.logout();
       auth();
     },
-    stopStream() {
-      console.log("stopping.......");
+    async stopStream() {
       this.socket.emit("stop", this.user.email);
-      setTimeout(() => backend.stopStream(), 2000);
+      await backend.stopStream();
+      setTimeout(
+        () =>
+          this.socket2.emit(
+            "streamStop",
+            window.location.href.split("stream/")[1]
+          ),
+        1000
+      );
     }
   },
   // computed: {
@@ -148,9 +155,12 @@ export default {
   created() {
     this.getUser();
     console.log(this.$route);
-    this.socket2.on(`stopStream`,(streamCode)=>{
-      if(window.location.href.split("stream/")[1] == streamCode) window.location.replace('/home')
-    } )
+    this.socket2.on("stopStream", streamCode => {
+      console.log(streamCode);
+      //alert(`${window.location.href.split("stream/")[1]} vs ${streamCode}`);
+      if (window.location.href.split("stream/")[1] == streamCode)
+        window.location.replace("/home");
+    });
   }
 };
 </script>
