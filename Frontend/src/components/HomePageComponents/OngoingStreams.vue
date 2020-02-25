@@ -6,7 +6,7 @@
         streams
       </h1>
       <v-spacer></v-spacer>
-      <v-btn text small>Refresh</v-btn>
+      <v-btn text small @click="getcurrentlyStreaming()">Refresh</v-btn>
     </v-row>
     <v-row>
       <v-col v-for="stream in streams" :key="stream.id" :lg="4" :md="6" :xs="12">
@@ -31,6 +31,25 @@
 export default {
   props: {
     streams: Object
+  },
+    methods: {
+    async getcurrentlyStreaming(limit) {
+      const streams = await backend.getCurrentlyStreaming(limit, true);
+      console.log(streams.data);
+      if (streams.data) {
+        streams.data.forEach(stream => {
+          this.streams.push({
+            id: stream.streamCode,
+            title: stream.streamTitle,
+            description: stream.description,
+            isPrivate: true,
+            author: stream.ownerName,
+            date: stream.date,
+            img_url: "http://kit8.net/images/detailed/4/data_centre.png"
+          });
+        });
+      }
+    }
   }
 };
 </script>

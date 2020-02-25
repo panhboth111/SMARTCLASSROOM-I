@@ -53,7 +53,7 @@
           </v-tooltip>
 
           <div class="profileInfo">
-            <v-avatar size="130" class=" profilePic mb-2">
+            <v-avatar size="130" class="profilePic mb-2">
               <v-avatar size="120" class @click="showProfilePic = true">
                 <img :src="user.profilePic" />
               </v-avatar>
@@ -199,8 +199,7 @@ export default {
       newPassword: "",
       confirmPassword: "",
       errorMsg: "",
-      streams: [
-      ]
+      streams: []
     };
   },
   methods: {
@@ -224,7 +223,7 @@ export default {
         this.coverPicURL = fileReader.result;
         const response = await backend.changeCover(this.coverPicURL);
         alert(response.message);
-        window.location.reload();
+        location.reload();
       });
     },
     async onProfilePicPicked(event) {
@@ -238,7 +237,7 @@ export default {
         this.profilePicURL = fileReader.result;
         const response = await backend.changeProfile(this.profilePicURL);
         alert(response.message);
-        window.location.reload();
+        location.reload();
       });
     },
     editProfile() {
@@ -287,7 +286,7 @@ export default {
 
 <style scoped>
 .profilePic {
-  z-index: 10;
+  z-index: 0;
 }
 
 .profileInfo {
@@ -302,12 +301,12 @@ export default {
 }
 
 .profilePicBtn {
-  z-index: 10;
+  z-index: 0;
   top: 75%;
 }
 
 .editProfileBtn {
-  z-index: 10;
+  z-index: 1;
 }
 
 .coverPic {
@@ -315,6 +314,6 @@ export default {
 }
 
 .coverPicBtn {
-  z-index: 10;
+  z-index: 1;
 }
 </style>

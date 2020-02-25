@@ -182,7 +182,7 @@ export default {
   data: () => ({
     loading: false,
     devices: [],
-    socket: io(`http://${URL}:3001`),
+    socket: io(`${URL}:3001`),
     selectedDevice: "",
     tag_list: [],
     create_stream: false,

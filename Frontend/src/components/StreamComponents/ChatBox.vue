@@ -122,6 +122,7 @@
 import io from "socket.io-client";
 import backend from "../../Service"
 import emojis from "emojis"
+import { URL } from "../../../config";
 // import emojiCo from "emoji-js"
 // import axios from 'axios'
 export default {
@@ -129,7 +130,7 @@ export default {
   data() {
     return {
       username: "",
-      socket: io("http://10.10.17.15:4000"),
+      socket: io(`${URL}:4000`),
       users: [],
       msg: "",
       tab: null,
@@ -157,8 +158,11 @@ export default {
     },
     // eslint-disable-next-line no-unused-vars
     setEmoji(event){
+      const emojiReg = /.?:[a-z,0-9]{0,}:.?/ig
       // alert(event.keyCode)
-      this.msg = emojis.unicode(this.msg)
+      if (emojiReg.test(this.msg)){
+        this.msg = emojis.unicode(this.msg)
+      }
     },
     getText() {
       const roomId = window.location.href.split("stream/")[1];

@@ -81,6 +81,7 @@ export default {
         this.userName = this.userEmail = this.userRole = ""
         this.getAllUsers()
         this.editUserModal = false
+
       }
     },
 
@@ -91,10 +92,10 @@ export default {
       _users = _users.data
       this.users = [..._users].filter(_user => _user.role !== "Device")
     },
-    
     async refresh(){
       this.getAllUsers()
     }
+    
   },
   created(){
     this.getAllUsers()

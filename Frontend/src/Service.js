@@ -126,16 +126,22 @@ class Service {
   }
 
   // Stop stream
-  static async stopStream() {
+  static async stopStream(usedBy = "user", streamCode = "none") {
+    let route = usedBy === "admin" ? "adminStopStream" : "stopStream";
     const token = cookie.getCookie("auth-token"); //window.localStorage.getItem("auth-token")
-    const result = await axios.get(`${url}streams/stopStream`, {
-      params: {},
-      headers: { "auth-token": token }
-    });
-
-    if (result.data.status) {
-      window.location.replace("/home");
-    }
+    const result = await axios
+      .post(
+        `${url}streams/${route}`,
+        {
+          streamCode
+        },
+        {
+          params: {},
+          headers: { "auth-token": token }
+        }
+      )
+      .catch(err => alert(err));
+    return result;
   }
 
   // Get Stream detail
@@ -185,7 +191,6 @@ class Service {
     if (success) {
       cookie.setCookie("auth-token", token, 30); //window.localStorage.setItem("auth-token",token)
       localStorage.setItem("LastLogged", Date.now());
-      alert(message);
       window.location.replace("/home");
     }
     return message;
@@ -215,7 +220,7 @@ class Service {
 
   // Get All Chats
   static async getAllChat(roomId) {
-    const chat = await axios.post(`http://localhost:4000/getChat`, {
+    const chat = await axios.post(`http://${URL}:4000/getChat`, {
       roomId
     });
     if (chat.data != undefined) {

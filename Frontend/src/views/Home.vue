@@ -31,29 +31,7 @@ export default {
     return {
       socket: io(`http://${URL}:3001`),
       streams: []
-      // videos: [
-      //   {
-      //     id: 1,
-      //     title: "Introduction to Design Patterns",
-      //     author: "Vignesh Manoharan",
-      //     img_url:
-      //       "https://images.unsplash.com/photo-1558979158-65a1eaa08691?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
-      //   },
-      //   {
-      //     id: 2,
-      //     title: "Introduction to Design Patterns",
-      //     author: "Vignesh Manoharan",
-      //     img_url:
-      //       "https://images.unsplash.com/photo-1558979158-65a1eaa08691?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
-      //   },
-      //   {
-      //     id: 3,
-      //     title: "Introduction to Design Patterns",
-      //     author: "Vignesh Manoharan",
-      //     img_url:
-      //       "https://images.unsplash.com/photo-1558979158-65a1eaa08691?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
-      //   }
-      // ]
+
     };
   },
   methods: {

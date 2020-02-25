@@ -108,8 +108,8 @@ import { mapState } from "vuex";
 export default {
   data: () => {
     return {
-      socket: io(`http://${URL}:3001`),
-      socket2: io(`http://${URL}:3002`),
+      socket: io(`${URL}:3001`),
+      socket2: io(`${URL}:3000`),
       stream_drawer: false,
       drawer: false,
       item: 1,
@@ -133,10 +133,19 @@ export default {
       backend.logout();
       auth();
     },
-    stopStream() {
-      console.log("stopping.......");
-      this.socket.emit("stop", this.user.email);
-      setTimeout(() => backend.stopStream(), 2000);
+    async stopStream() {
+     // this.socket.emit("stop", this.user.email);
+      await backend.stopStream();
+      await setTimeout(
+        () =>{
+          this.socket2.emit(
+            "streamStop",
+            window.location.href.split("stream/")[1]
+          )
+          window.location.replace('/home')
+        },
+        1000
+      );     
     }
   },
   // computed: {
@@ -148,9 +157,12 @@ export default {
   created() {
     this.getUser();
     console.log(this.$route);
-    this.socket2.on(`stopStream`,(streamCode)=>{
-      if(window.location.href.split("stream/")[1] == streamCode) window.location.replace('/home')
-    } )
+    this.socket2.on("stopStream", streamCode => {
+      console.log(streamCode);
+      //alert(`${window.location.href.split("stream/")[1]} vs ${streamCode}`);
+      if (window.location.href.split("stream/")[1] == streamCode)
+        window.location.replace("/home");
+    });
   }
 };
 </script>

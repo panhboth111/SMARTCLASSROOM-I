@@ -41,8 +41,7 @@ export default {
   },
   methods: {
     async login() {
-      const message = await backend.login(this.username, this.password);
-      alert(message.message);
+      await backend.login(this.username, this.password);
     },
     async register() {
       const user = await backend.signUp(
