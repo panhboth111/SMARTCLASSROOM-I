@@ -20,7 +20,7 @@ class UserService {
   async user({ email }) {
     return new Promise(async (resolve, reject) => {
       const user = await User.findOne({ email });
-      resolve(user);
+      return resolve(user);
     });
   }
   async signUp({ email, name, pwd }) {
@@ -30,12 +30,9 @@ class UserService {
       let role = "";
       if (reg.test(email)) role = "Student";
       else if (Devreg.test(email)) role = "Device";
-      else resolve({ message: "Only KIT email is allowed", errCode: "SU-001" });
-      console.log("here");
+      else return resolve({ message: "Only KIT email is allowed", errCode: "SU-001" });
       bcrypt.genSalt(10, async (err, salt) => {
-        console.log("1");
         bcrypt.hash(pwd, salt, async (err, hash) => {
-          console.log("2");
           if (err) reject(err);
           try {
             const credential = new Credential({
@@ -49,14 +46,14 @@ class UserService {
             });
             await user.save();
             await credential.save();
-            resolve({ message: "Account registered as successfully!" });
+            return resolve({ message: "Account registered as successfully!" });
           } catch (err) {
             if (err.code == 11000)
               resolve({
                 message: "Email is already registered!",
                 errCode: "SU-002"
               });
-            resolve({ err: err.message, errCode: "SU-003" });
+            return resolve({ err: err.message, errCode: "SU-003" });
           }
         });
       });
@@ -81,17 +78,17 @@ class UserService {
       };
       const validateRes = validate({ email, pwd }, constraint);
       if (validateRes == undefined)
-        resolve({ message: "Invalid", success: false });
+        return resolve({ message: "Invalid", success: false });
       const existUser = await Credential.findOne({ email: email });
       if (!existUser)
-        resolve({
+        return resolve({
           message: "Email does not match with any user",
           success: false,
           token: null
         });
       const user = await User.findOne({ email });
       bcrypt.compare(pwd, existUser.pwd, (err, isMatch) => {
-        if (err) resolve({ err });
+        if (err) return resolve({ err });
         if (isMatch) {
           // if the pwd matches
           // Sign the token
@@ -101,11 +98,11 @@ class UserService {
           );
           console.log("New Login from : " + email);
           //Put token in the header
-          resolve({ message: "Logged in successfully", success: true, token });
+          return resolve({ message: "Logged in successfully", success: true, token });
         } else {
           // if the pwd is not match
           //resolve({"message" : "Password entered is incorrect"})
-          resolve(
+          return resolve(
             resolve({
               message: "Incorrect password",
               success: false,
@@ -119,7 +116,7 @@ class UserService {
   async changePassword(email, password, newPassword) {
     return new Promise(async (resolve, reject) => {
       if (password == newPassword)
-        resolve({
+        return resolve({
           message: "New password can't be the same to the previous password!",
           errCode: "CP-001"
         });
@@ -138,38 +135,38 @@ class UserService {
         { password: password, password: newPassword },
         constraint
       );
-      if (validateRes != undefined) resolve(validateRes);
+      if (validateRes != undefined) return resolve(validateRes);
       const existUser = await Credential.findOne({ email: email });
       bcrypt.compare(password, existUser.pwd, async (err, isMatch) => {
-        if (err) resolve(err);
+        if (err) return resolve(err);
         if (isMatch) {
           // if the pwd matches
           // Generate new hash and pass it into database
           await bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(newPassword, salt, async (err, hash) => {
-              if (err) resolve({ err });
+              if (err) return resolve({ err });
               try {
                 const result = await Credential.updateOne(
                   { email: email },
                   { pwd: hash }
                 );
                 if (result.n >= 1) {
-                  resolve({ message: "Password changed as successfully!" });
+                  return resolve({ message: "Password changed as successfully!" });
                 } else {
-                  resolve({
+                  return resolve({
                     message:
                       "Problem Occured during the process of changing password!",
                     errCode: "CP-003"
                   });
                 }
               } catch (err) {
-                resolve({ err: err.message, errCode: "CP-004" });
+                return resolve({ err: err.message, errCode: "CP-004" });
               }
             });
           });
         } else {
           // if the pwd is not match
-          resolve({ message: "Incorrect Password!", errCode: "CP-002" });
+          return resolve({ message: "Incorrect Password!", errCode: "CP-002" });
         }
       });
     });
@@ -184,7 +181,7 @@ class UserService {
           { role: targetRole }
         );
         if (update.n > 0)
-          resolve({
+          return resolve({
             message:
               "Success fully update user '" +
               targetUser +
@@ -193,12 +190,12 @@ class UserService {
               "'"
           });
         else
-          resolve({
+          return resolve({
             messgage: "An error occurred during role changing process",
             errCode: "CR-002"
           });
       } else
-        resolve({
+        return resolve({
           message: "You are not authorized to performed the following task",
           errCode: "CR-001"
         });
