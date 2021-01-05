@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "mongoose": "^5.8.11",
     "python-shell": "^1.0.8",
     "socket.io-client": "^2.3.0",
